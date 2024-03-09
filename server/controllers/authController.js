@@ -42,7 +42,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !correct) {
     return next(new AppError("Incorrect Email or password", 401));
   }
-  return res.status(200).json({
+  res.status(200).json({
     status: "success",
     data: {
       user,
