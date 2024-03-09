@@ -10,7 +10,7 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 // const URI= process.env.MONGODB_URL;
-mongoose.connect("mongodb://127.0.0.1/hotelDB", { useNewUrlParser: true })
+mongoose.connect("mongodb://127.0.0.1/FeedMe", { useNewUrlParser: true })
   .then(() => console.log("DB connected Successfull...."));
 
 const port = process.env.PORT;

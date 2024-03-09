@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+// const Food = require("./foodModel");
 
 const restaurantSchema = new mongoose.Schema({
     name:{
@@ -14,7 +15,7 @@ const restaurantSchema = new mongoose.Schema({
     },
     address:{
         type:String,
-        // required:[true, "Please enter the address of your establishment"],
+        required:[true, "Please enter the address of your establishment"],
     },
     // ownerName:
     // {
@@ -62,7 +63,7 @@ const restaurantSchema = new mongoose.Schema({
       ],
       fooditems:[
         {
-            type:mongoose.Schema.ObjectId,
+            type:mongoose.Schema.Types.ObjectId,
             ref:"Food",
         }
       ],
