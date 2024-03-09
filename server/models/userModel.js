@@ -12,7 +12,14 @@ const userSchema = new mongoose.Schema({
     required: [true, "A User must have a Email"],
     unique: true,
     lowercase: true,
-    validate: [validator.isEmail, "please provide a valid Email"],
+    validate: {
+        validator: function(value) {
+          // Regular expression to match email addresses ending with "@mnnit.ac.in"
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@mnnit\.ac\.in$/;
+          return emailRegex.test(value);
+        },
+        message: props => `${props.value} is not a valid email address ending with @mnnit.ac.in!`
+    }
   },
   role: {
     type: String,
