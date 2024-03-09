@@ -7,5 +7,6 @@ router.use(express.json());
 
 router.post("/signup", restaurantController.signup);
 router.post("/login", restaurantController.login);
+router.post("/myEatery" , restaurantController.myEatery);
 
 module.exports = router;

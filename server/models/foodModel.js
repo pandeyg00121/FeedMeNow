@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+// const Restaurant = require("./restaurantModel");
 
 const foodSchema = new mongoose.Schema({
   name: {
@@ -35,6 +36,12 @@ const foodSchema = new mongoose.Schema({
       ref: "Reviews",
     },
   ],
+  restaurant:
+  {
+    required:true,
+    type:mongoose.Schema.Types.ObjectId,
+    ref: "Restaurant",
+  }
 });
 
 

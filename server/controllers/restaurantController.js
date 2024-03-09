@@ -1,12 +1,13 @@
 const Restaurant = require("./../models/restaurantModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const Food= require("./../models/foodModel");
 
 exports.signup = catchAsync(async (req, res, next) => {
   
     const newRestaurant = await Restaurant.create({
       name: req.body.name,
-    //   address: req.body.address,
+      address: req.body.address,
       email: req.body.email,
       type: req.body.type,
     //   ownerName: req.body.owner,
@@ -23,6 +24,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     });
 });
 
+
 exports.login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
 
@@ -34,7 +36,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const resUser = await Restaurant.findOne({ email }).select("+password");
   // console.log(user);
   const correct = await resUser.correctPassword(password, resUser.password);
-
+ 
   if (!resUser || !correct) {
     return next(new AppError("Incorrect Email or password", 401));
   }
@@ -44,4 +46,30 @@ exports.login = catchAsync(async (req, res, next) => {
       resUser,
     },
   });
+
+
+  
+
+});
+
+
+
+exports.myEatery= catchAsync(async (req, res, next) => {
+    const newFoodItem = await Food.create({
+        name: req.body.name,
+        type: req.body.type,
+        price: req.body.price,
+        description: req.body.description,
+        // image: req.body.image,
+        restaurant: req.body.restaurant,
+      
+      });
+    
+      res.status(201).json({
+        status: "success",
+        data: {
+          foodItem: newFoodItem,
+        },
+      });
+
 });
