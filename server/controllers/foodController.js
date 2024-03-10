@@ -13,13 +13,3 @@ exports.getAllFoods = catchAsync(async(req,res,next)=>{
     });
 });
 
-// exports.createFood = catchAsync(async(req,res,next)=>{
-//     const newFood = await Food.create(req.body);
-  
-//     res.status(201).json({
-//       status: 'success',
-//       data: {
-//         newFood
-//       }
-//     });
-// });
