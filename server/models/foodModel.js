@@ -30,12 +30,6 @@ const foodSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
-  reviews: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Reviews",
-    },
-  ],
   restaurant:
   {
     required:true,

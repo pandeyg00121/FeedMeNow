@@ -9,3 +9,10 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 
 module.exports = router;
+
+//dashboard of user will have
+//his current order
+//his details
+//all his past orders
+//all his restaurant reviews
+//cart
