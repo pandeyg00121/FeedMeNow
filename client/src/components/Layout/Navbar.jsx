@@ -1,8 +1,9 @@
 import React from 'react';
-import {Box, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, HStack, Heading, Input, VStack, useDisclosure} from "@chakra-ui/react"
+import {Box, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, HStack,Input, VStack, useDisclosure,Image,Stack,Text} from "@chakra-ui/react"
 import { Link } from 'react-router-dom';
 import {RiDashboardFill, RiLogoutBoxLine, RiMenu5Fill} from "react-icons/ri";
 import { FaSearch } from "react-icons/fa";
+import logo from "../../assets/logo.jfif"
 
 const LinkButton=({url="/",title="Home",onClose})=>(
   <Link onClick={onClose} to={url}>
@@ -14,7 +15,10 @@ const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isAuthenticated=true;
     const user={
-        role:"user"
+        _id:"123456890qwerty",
+        name:"Pranay Pandey",
+        role:"user",
+        profilePic:"https://media.licdn.com/dms/image/D4D03AQGM3TYJYte9bA/profile-displayphoto-shrink_800_800/0/1687941627773?e=1715817600&v=beta&t=59SDcTROZWoNY8O7S3hTWYqGdqvgUMjWpHB2i5HR95s"
     }
     const logoutHandler=()=>{
       console.log("logout");
@@ -22,11 +26,11 @@ const Navbar = () => {
   }
 
   return (
-    <HStack p={4} justifyContent={"space-between"}>
+    <HStack p={2} justifyContent={"space-between"} bgColor="rgba(0,0,0,0.6)">
       {/*Left Side*/}
       <Box>
       <Link to={"/"}>
-      <Heading children="FeedMeNow" size={["sm","md"]} fontFamily={"cursive"} color={"yellow.500"}/>
+      <Image src={logo} borderRadius="full" boxSize="60px" objectFit="cover"/>
       </Link>
       </Box>
       {/*Center*/}
@@ -53,15 +57,24 @@ const Navbar = () => {
       </Link>
       </HStack>
       {/*Right Side*/}
-      <Box>
-      <Button onClick={onOpen} colorScheme='yellow' width={"12"} height={"12"} 
+      <Stack direction="col">
+      {
+        user && user.role==='user' && (<>
+          <Link to={`user/${user._id}`}>
+          <Image src={user.profilePic} borderRadius="full" boxSize="42px" objectFit="cover"/>
+          </Link>
+          <Text children={`Hello! ${user.name.split(' ')[0]}`} fontSize={["medium","large"]} mt={"10px"} fontFamily="sans-serif" fontWeight={"bold"}/>
+          </>
+        )
+      }
+      <Button onClick={onOpen} colorScheme='yellow' width={"10"} height={"10"} 
       zIndex={'overlay'} >
         <RiMenu5Fill/>
       </Button>
       <Drawer placement='right' onClose={onClose} isOpen={isOpen}>
        <DrawerOverlay />
        <DrawerHeader/>
-       <DrawerContent bg="rgba(0, 0, 0, 0.3)">
+       <DrawerContent bg="rgba(0, 0, 0, 0.7)">
         <DrawerBody mt={5}>
             <VStack spacing={"8"} alignItems={"flex-start"}>
               <LinkButton onClose={onClose} url="/" title="Home"/>
@@ -70,14 +83,7 @@ const Navbar = () => {
              {
                 isAuthenticated?(<>
                     <VStack>
-                        <HStack>
-                           {user && user.role==="user" && (<Link onClick={onClose} to="/profile">
-                            <Button variant={"ghost"} colorScheme='yellow'>
-                                Profile
-                            </Button>
-                           </Link>)}
-                            
-                        </HStack>
+                        
                         {
                             user && user.role==="admin" && <Link onClick={onClose} to="/admin/dashboard">
                                 <Button colorScheme='purple' variant={"ghost"}>
@@ -114,7 +120,7 @@ const Navbar = () => {
         </DrawerBody>
        </DrawerContent>
       </Drawer>
-      </Box>
+      </Stack>
      </HStack>
   );
 };
