@@ -14,15 +14,6 @@ router.use(restaurantController.protect);
 router.get('/dashboard',restaurantController.dashboard);
 router.post("/addItem", restaurantController.addItem);
 
-router.use(authController.restrictTo('admin'));
-
-router.get("/all",restaurantController.getAllRestaurants)
-
-
-router.get("/all/:id",restaurantController.getRestaurant)
-// router.patch(userController.updateUser)
-router.delete("/all/:id",restaurantController.deleteRestaurant);
-
 module.exports = router;
 
 //dashboard of restaurant will have

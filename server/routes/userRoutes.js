@@ -14,15 +14,6 @@ router.use(authController.protect);
 
 router.get("/me", userController.getMe);
 
-router.use(authController.restrictTo('admin'));
-
-router.get("/all",userController.getAllUsers)
-
-
-router.get("/all/:id",userController.getUser)
-// router.patch(userController.updateUser)
-router.delete("/all/:id",userController.deleteUser);
-
 module.exports = router;
 
 //dashboard of user will have
