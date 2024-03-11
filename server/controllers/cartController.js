@@ -38,13 +38,16 @@ exports.addItemToCart = catchAsync(async (req, res, next) => {
           {
             restaurant: restaurantId,
             items: [
-              { food: foodId, quantity: 1 },
+              { food: foodId, quantity: 1, price: food.price  },
             ],
+            rPrice: food.price,
+            active:true,
           },
         ],
+        totalPrice: food.price,
       });
       
-      console.log(cart);
+    //   console.log(cart);
     } else {
       // Check if the restaurant is already in the cart
       const existingRestaurantIndex = cart.restaurants.findIndex((r) => r.restaurant.equals(restaurantId));
@@ -53,21 +56,29 @@ exports.addItemToCart = catchAsync(async (req, res, next) => {
         // If the restaurant is not in the cart, add it
         cart.restaurants.push({
           restaurant: restaurantId,
-          items: [{ food: foodId, quantity:1 }],
+          items: [{ food: foodId, quantity:1, price:food.price }],
+          rPrice:food.price,
+          active:true,
         });
       } else {
         // If the restaurant is already in the cart, checking if the food item is in the restaurant
         const existingFoodIndex = cart.restaurants[existingRestaurantIndex].items.findIndex((item) => item.food.equals(foodId));
   
         if (existingFoodIndex === -1) {
-          // If the food item is not in the restaurant, add it
-          cart.restaurants[existingRestaurantIndex].items.push({ food: foodId, quantity:1 });
+          // If the food item is not in the restaurant, adding it
+          cart.restaurants[existingRestaurantIndex].items.push({ food: foodId, quantity:1, price:food.price });
         } else {
-          // If the food item is already in the restaurant, update the quantity
+          // If the food item is already in the restaurant, updating the quantity
 
           cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity ++;
+          
+          cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].price +=food.price;
         }
+        cart.restaurants[existingRestaurantIndex].rPrice += food.price;
+
       }
+    //  if( cart.restaurants[existingRestaurantIndex].active ===true)
+      cart.totalPrice += food.price;
     }
   
     // Save the updated or newly created cart to the database
@@ -102,15 +113,22 @@ exports.removeItemFromCart = catchAsync(async (req, res, next) => {
     return res.status(404).json({ message: 'Restaurant not found in the cart' });
   }
 
-  // Check if the food item is in the restaurant
+  // Checking if the food item is in the restaurant
   const existingFoodIndex = cart.restaurants[existingRestaurantIndex].items.findIndex((item) => item.food.equals(foodId));
 
   if (existingFoodIndex === -1) {
     return res.status(404).json({ message: 'Food item not found in the restaurant' });
   }
 
+  // Updating the restaurant and overall cart prices
+  const removedItemPrice = cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].price;
+  cart.restaurants[existingRestaurantIndex].rPrice -= removedItemPrice;
+//   if(cart.restaurants[existingRestaurantIndex].active)
+  cart.totalPrice -= removedItemPrice;
+
   // Remove the food item from the restaurant
   cart.restaurants[existingRestaurantIndex].items.splice(existingFoodIndex, 1);
+
 
   // If the restaurant is now empty, remove it from the cart
   if (cart.restaurants[existingRestaurantIndex].items.length === 0) {
@@ -159,6 +177,14 @@ exports.updateCartItemQuantity = catchAsync(async (req, res, next) => {
     if (action === '+') {
       // Increment the quantity by 1
       cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity += 1;
+
+      // Update the restaurant and overall cart prices
+    cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].price+=food.price;
+    cart.restaurants[existingRestaurantIndex].rPrice += food.price;
+
+    // if(cart.restaurants[existingRestaurantIndex].active)
+    cart.totalPrice += food.price;
+
     } else if (action === '-') {
       // Decrement the quantity by 1
       cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity -= 1;
@@ -167,12 +193,23 @@ exports.updateCartItemQuantity = catchAsync(async (req, res, next) => {
       if (cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity === 0) {
         cart.restaurants[existingRestaurantIndex].items.splice(existingFoodIndex, 1);
       }
+
+      // If the restaurant becomes empty after removing the item, remove the entire restaurant from the cart
+    if (cart.restaurants[existingRestaurantIndex].items.length===0) {
+        cart.restaurants.splice(existingRestaurantIndex, 1);
+        cart.totalPrice -= food.price;
+      }
+    else{
+    
+          // Update the restaurant and overall cart prices
+     cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].price-=food.price;
+     cart.restaurants[existingRestaurantIndex].rPrice -= food.price;
+
+    //  if(cart.restaurants[existingRestaurantIndex].active)
+     cart.totalPrice -= food.price;
+    }
     }
   
-    // If the restaurant becomes empty after removing the item, remove the entire restaurant from the cart
-    if (cart.restaurants[existingRestaurantIndex].items.length === 0) {
-      cart.restaurants.splice(existingRestaurantIndex, 1);
-    }
   
     await cart.save();
   
