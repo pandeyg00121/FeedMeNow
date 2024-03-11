@@ -181,7 +181,7 @@ exports.deleteRestaurant = catchAsync(async (req,res,next)=>{
 exports.getRestaurant =  catchAsync(async (req,res,next)=>{   
   const restaurant = await Restaurant.findById(req.params.id);
 
-  if (!user) {
+  if (!restaurant) {
    return next(new AppError('No document found with that ID', 404));
   } 
 
@@ -194,13 +194,39 @@ exports.getRestaurant =  catchAsync(async (req,res,next)=>{
 });
 
 exports.getAllRestaurants = catchAsync(async (req,res,next)=>{ 
-  const allRestaurants= await Restaurant.find();
+  const allRestaurants= await Restaurant.find({ active: true });
   
   return res.status(200).json({
       status:'success',
       result: allRestaurants.length,
       data:{
           data : allRestaurants
+      }
+  });
+});
+
+exports.getAllPendingRestaurants = catchAsync(async (req,res,next)=>{ 
+  const allPendingRestaurants= await Restaurant.find({ active: false });
+  
+  return res.status(200).json({
+      status:'success',
+      result: allPendingRestaurants.length,
+      data:{
+          data : allPendingRestaurants
+      }
+  });
+});
+
+exports.approvePendingRestaurants = catchAsync(async (req,res,next)=>{ 
+  const restaurant = await Restaurant.findByIdAndUpdate(req.params.id, { active: true }, {
+    new: true,
+    runValidators: true
+  });
+  
+  return res.status(200).json({
+      status:'success',
+      data:{
+          data : restaurant
       }
   });
 });
