@@ -149,7 +149,7 @@ const Home = () => {
                 >
                   <Flex justifyContent="center" backgroundColor="rgba(0,0,0,0.7)" p={2}  borderRadius={"20px"}>
                   <Link to={`/restaurant/${restaurant._id}`}>
-                  <Heading children={restaurant.name} />
+                  <Heading children={restaurant.name} color={"white"}/>
                   </Link>
                   </Flex>
                 </div>
