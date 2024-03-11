@@ -1,7 +1,8 @@
 # INNODEV 2K24 <br>
 
-##Feed Me Now <br>
-##Team Name: Web Deviola <br>
+**Feed Me Now** <br> 
+
+**Team Name: Web Deviola**  <br>
 Team Members Name: <br>
 Pranay Pandey - https://github.com/pandeyg00121 <br>
 Jatin Garg - https://github.com/jatingarg0410 <br>
