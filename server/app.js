@@ -7,8 +7,11 @@ const AppError = require("./utils/appError");
 const userRouter = require("./routes/userRoutes");
 const foodRouter = require('./routes/foodRoutes');
 const restaurantRouter = require('./routes/restaurantRoutes');
+
+const viewRouter = require('./routes/viewRouter');
+const cartRouter = require('./routes/cartRoutes');
+
 const adminRouter = require('./routes/adminRoutes');
-const viewRouter = require('./routes/viewRoutes');
 
 
 const app = express();
@@ -21,6 +24,7 @@ app.use(morgan("dev"));
 app.use("/api/users", userRouter);
 app.use("/api/foods", foodRouter);
 app.use("/api/restaurant", restaurantRouter);
+app.use("/api/users/cart", cartRouter);
 app.use("/api/admin", adminRouter);
 app.use('/',viewRouter);
 

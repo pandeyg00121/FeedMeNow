@@ -92,11 +92,11 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   //4)check if user changed password after JWT was issued
-  // if (freshRestaurant.changedPasswordAfter(decoded.iat)) {
-  //   return next(
-  //     new AppError("User recently changed password!,please log in again", 401)
-  //   );
-  // }
+  if (freshRestaurant.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password!,please log in again", 401)
+    );
+  }
   //all 4 steps verified then we grant acess of user to the next chained middleware
   req.restaurant = freshRestaurant;
   next();
@@ -146,23 +146,6 @@ exports.dashboard = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.addItem = catchAsync(async (req, res, next) => {
-  const newFoodItem = await Food.create({
-    name: req.body.name,
-    type: req.body.type,
-    price: req.body.price,
-    description: req.body.description,
-    // image: req.body.image,
-    restaurant: req.restaurant,
-  });
-
-  res.status(201).json({
-    status: "success",
-    data: {
-      foodItem: newFoodItem,
-    },
-  });
-});
 
 exports.deleteRestaurant = catchAsync(async (req,res,next)=>{  
 
@@ -202,8 +185,29 @@ exports.getAllRestaurants = catchAsync(async (req,res,next)=>{
       data:{
           data : allRestaurants
       }
+
+    });
+    
+
+exports.addItem= catchAsync(async (req, res, next) => {
+    const newFoodItem = await Food.create({
+        name: req.body.name,
+        type: req.body.type,
+        price: req.body.price,
+        description: req.body.description,
+        // image: req.body.image,
+        restaurant: req.restaurant.id,
+      
+      });
+    
+      res.status(201).json({
+        status: "success",
+        data: {
+          foodItem: newFoodItem,
+        },
+      });
   });
-});
+
 
 exports.getAllPendingRestaurants = catchAsync(async (req,res,next)=>{ 
   const allPendingRestaurants= await Restaurant.find({ active: false });

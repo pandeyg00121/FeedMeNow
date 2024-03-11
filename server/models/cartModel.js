@@ -21,6 +21,11 @@ const cartSchema = new mongoose.Schema({
           ref: 'Restaurant', // Reference to the Restaurant model
           required: true,
         },
+        active:{
+            type: Boolean,
+            default: true,
+            select: false,
+        },
         items: [
           {
             food: {
@@ -30,12 +35,22 @@ const cartSchema = new mongoose.Schema({
             },
             quantity: {
               type: Number,
-              default: 1,
+            //   default: 1,
             },
+            price:{ //price of each dish
+                type:Number,
+            }
           },
         ],
+       rPrice:{  //total price of each restaurant
+        type:Number,
+       },
       },
     ],
+    totalPrice:{ //total price of the cart
+        type:Number,
+    }
+
   });
   
   //  one user can have only one cart per restaurant
