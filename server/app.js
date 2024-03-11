@@ -8,7 +8,7 @@ const userRouter = require("./routes/userRoutes");
 const foodRouter = require('./routes/foodRoutes');
 const restaurantRouter = require('./routes/restaurantRoutes');
 const viewRouter = require('./routes/viewRouter');
-
+const cartRouter = require('./routes/cartRoutes');
 
 const app = express();
 //cross site scripting overcome
@@ -20,6 +20,7 @@ app.use(morgan("dev"));
 app.use("/api/users", userRouter);
 app.use("/api/foods", foodRouter);
 app.use("/api/restaurant", restaurantRouter);
+app.use("/api/users/cart", cartRouter);
 app.use('/',viewRouter);
 
 app.all("*", (req, res, next) => {

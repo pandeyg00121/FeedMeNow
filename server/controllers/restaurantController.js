@@ -165,7 +165,7 @@ exports.addItem= catchAsync(async (req, res, next) => {
         price: req.body.price,
         description: req.body.description,
         // image: req.body.image,
-        restaurant: req.restaurant,
+        restaurant: req.restaurant.id,
       
       });
     

@@ -6,7 +6,7 @@ const Cart = require("./../models/cartModel");
 
 // Get user's cart details
 exports.getCart = catchAsync(async (req, res, next) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   const cart = await Cart.findOne({ user: userId }).populate('restaurants.restaurant', 'name');
 
@@ -24,51 +24,70 @@ exports.getCart = catchAsync(async (req, res, next) => {
 
 // Add item to the cart
 exports.addItemToCart = catchAsync(async (req, res, next) => {
-  const userId = req.user._id;
-  const { restaurantId, foodId, quantity } = req.body;
-
-  const cart = await Cart.findOne({ user: userId });
-
-  if (!cart) {
-    return res.status(404).json({ message: 'Cart not found' });
-  }
-
-  // Check if the restaurant is already in the cart
-  const existingRestaurantIndex = cart.restaurants.findIndex((r) => r.restaurant.equals(restaurantId));
-
-  if (existingRestaurantIndex === -1) {
-    // If the restaurant is not in the cart, add it
-    cart.restaurants.push({
-      restaurant: restaurantId,
-      items: [{ food: foodId, quantity }],
-    });
-  } else {
-    // If the restaurant is already in the cart, checking if the food item is in the restaurant
-    const existingFoodIndex = cart.restaurants[existingRestaurantIndex].items.findIndex((item) => item.food.equals(foodId));
-
-    if (existingFoodIndex === -1) {
-      // If the food item is not in the restaurant, add it
-      cart.restaurants[existingRestaurantIndex].items.push({ food: foodId, quantity });
+    const userId = req.user.id;
+    const {foodId} = req.body;
+    const food = await Food.findOne({ _id: foodId });
+    const restaurantId = food.restaurant;
+    let cart = await Cart.findOne({ user: userId });
+    console.log(food);
+    if (!cart) {
+      // Create a new cart if not found
+      cart = await Cart.create({
+        user: userId,
+        restaurants: [
+          {
+            restaurant: restaurantId,
+            items: [
+              { food: foodId, quantity: 1 },
+            ],
+          },
+        ],
+      });
+      
+      console.log(cart);
     } else {
-      // If the food item is already in the restaurant, update the quantity
-      cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity += quantity;
+      // Check if the restaurant is already in the cart
+      const existingRestaurantIndex = cart.restaurants.findIndex((r) => r.restaurant.equals(restaurantId));
+  
+      if (existingRestaurantIndex === -1) {
+        // If the restaurant is not in the cart, add it
+        cart.restaurants.push({
+          restaurant: restaurantId,
+          items: [{ food: foodId, quantity:1 }],
+        });
+      } else {
+        // If the restaurant is already in the cart, checking if the food item is in the restaurant
+        const existingFoodIndex = cart.restaurants[existingRestaurantIndex].items.findIndex((item) => item.food.equals(foodId));
+  
+        if (existingFoodIndex === -1) {
+          // If the food item is not in the restaurant, add it
+          cart.restaurants[existingRestaurantIndex].items.push({ food: foodId, quantity:1 });
+        } else {
+          // If the food item is already in the restaurant, update the quantity
+
+          cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity ++;
+        }
+      }
     }
-  }
-
-  await cart.save();
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      cart,
-    },
+  
+    // Save the updated or newly created cart to the database
+    await cart.save();
+  
+    res.status(201).json({
+      status: 'success',
+      data: {
+        cart,
+      },
+    });
   });
-});
+  
 
 // Remove item from the cart
 exports.removeItemFromCart = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
-  const { restaurantId, foodId } = req.params;
+  const  {foodId}  = req.body;
+  const food = await Food.findOne({ _id: foodId });
+  const restaurantId = food.restaurant;
 
   const cart = await Cart.findOne({ user: userId });
 
@@ -110,43 +129,58 @@ exports.removeItemFromCart = catchAsync(async (req, res, next) => {
 
 // Update item quantity in the cart
 exports.updateCartItemQuantity = catchAsync(async (req, res, next) => {
-  const userId = req.user._id;
-  const { restaurantId, foodId } = req.params;
-  const { quantity } = req.body;
-
-  const cart = await Cart.findOne({ user: userId });
-
-  if (!cart) {
-    return res.status(404).json({ message: 'Cart not found' });
-  }
-
-  // Check if the restaurant is in the cart
-  const existingRestaurantIndex = cart.restaurants.findIndex((r) => r.restaurant.equals(restaurantId));
-
-  if (existingRestaurantIndex === -1) {
-    return res.status(404).json({ message: 'Restaurant not found in the cart' });
-  }
-
-  // Check if the food item is in the restaurant
-  const existingFoodIndex = cart.restaurants[existingRestaurantIndex].items.findIndex((item) => item.food.equals(foodId));
-
-  if (existingRestaurantIndex === -1) {
-    // If the restaurant is not in the cart, add it
-    cart.restaurants.push({
-      restaurant: restaurantId,
-      items: [{ food: foodId, quantity }],
-    });
-  } else {
-    // If the restaurant is already in the cart, check if the food item is in the restaurant
+    const userId = req.user._id;
+    const {  foodId,action } = req.body;
+    const food = await Food.findOne({ _id: foodId });
+  const restaurantId = food.restaurant;
+    
+  
+    const cart = await Cart.findOne({ user: userId });
+  
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+  
+    // Check if the restaurant is in the cart
+    const existingRestaurantIndex = cart.restaurants.findIndex((r) => r.restaurant.equals(restaurantId));
+  
+    if (existingRestaurantIndex === -1) {
+      return res.status(404).json({ message: 'Restaurant not found in the cart' });
+    }
+  
+    // Check if the food item is in the restaurant
     const existingFoodIndex = cart.restaurants[existingRestaurantIndex].items.findIndex((item) => item.food.equals(foodId));
   
     if (existingFoodIndex === -1) {
-      // If the food item is not in the restaurant, add it
-      cart.restaurants[existingRestaurantIndex].items.push({ food: foodId, quantity });
-    } else {
-      // If the food item is already in the restaurant, update the quantity
-      cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity += quantity;
+      return res.status(404).json({ message: 'Food item not found in the restaurant' });
     }
-  }
-
-});
+  
+    // Update the quantity based on the action
+    if (action === '+') {
+      // Increment the quantity by 1
+      cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity += 1;
+    } else if (action === '-') {
+      // Decrement the quantity by 1
+      cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity -= 1;
+  
+      // If the quantity becomes 0, remove the food item
+      if (cart.restaurants[existingRestaurantIndex].items[existingFoodIndex].quantity === 0) {
+        cart.restaurants[existingRestaurantIndex].items.splice(existingFoodIndex, 1);
+      }
+    }
+  
+    // If the restaurant becomes empty after removing the item, remove the entire restaurant from the cart
+    if (cart.restaurants[existingRestaurantIndex].items.length === 0) {
+      cart.restaurants.splice(existingRestaurantIndex, 1);
+    }
+  
+    await cart.save();
+  
+    res.status(200).json({
+      status: 'success',
+      data: {
+        cart,
+      },
+    });
+  });
+  
