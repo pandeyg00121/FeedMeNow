@@ -137,7 +137,3 @@ exports.forgotPassword = async(req,res,next)=>{
     const message = `Forgot your password? Submit a PATCH request with your new password and 
     passwordConfirm to:${resetURL}.\n If not prompted ignore this message`;
 };
-
-exports.getMe = (req,res,next)=>{
-  res.send('hyyyyy');
-};

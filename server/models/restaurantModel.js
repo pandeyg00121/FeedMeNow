@@ -52,8 +52,8 @@ const restaurantSchema = new mongoose.Schema({
       },
       active: {
         type: Boolean,
-        default: true,
-        select: false,
+        default: false,
+        // select: false,
       },
       reviews: [
         {
