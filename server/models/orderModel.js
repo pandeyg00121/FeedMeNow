@@ -31,17 +31,29 @@ const orderSchema = new mongoose.Schema({
           },
         },
       ],
+      rpice:{
+        type:Number,
+        required:true,
+      },
+      status: {
+        type: String,
+        enum: ['Pending', 'Preparing', 'Delivered'],
+        default: 'Pending',
+      },
     },
   ],
-  totalAmount: {
-    type: Number,
-    required: true,
+  payment:
+  {
+    type:String,
+    enum: [ 'Cash On Delivery', 'Online Payment'],
+        default: 'Online Payment',
   },
-  status: {
-    type: String,
-    enum: ['Pending', 'Confirmed', 'Delivered'],
-    default: 'Pending',
-  },
+  createdAt:
+  {
+    type:Date,
+    defualt:Date.now,
+  }
+ 
   // Add any other necessary fields such as delivery address, payment information, etc.
 }, { timestamps: true });
 

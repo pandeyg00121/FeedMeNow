@@ -1,58 +1,51 @@
+const Order = require("./../models/orderModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
-const Order = require("./../models/orderModel");
 const Cart = require("./../models/cartModel");
+
 
 // Place an order
 exports.placeOrder = catchAsync(async (req, res, next) => {
   const userId = req.user.id;
 
-  // Fetch the user's cart
+  // Find the user's cart
   const cart = await Cart.findOne({ user: userId }).populate('restaurants.restaurant', 'name');
 
   if (!cart) {
-    return res.status(404).json({ status: 'error', message: 'Cart not found' });
+    return next(new AppError('Cart not found', 404));
   }
 
-  // Get the selected restaurant IDs from the request (replace this with your actual implementation)
-  const selectedRestaurantIds = req.body.selectedRestaurantIds || [];
+  // Create an order for each restaurant in the cart
+  const orders = cart.restaurants.map(async (restaurant) => {
+    const order = await Order.create({
+      user: userId,
+      restaurants: [
+        {
+          restaurant: restaurant.restaurant,
+          items: restaurant.items,
+          rpice: restaurant.rPrice,
+          status: 'Pending',
+        },
+      ],
+    });
 
-  // Filter the selected restaurants from the cart
-  const selectedRestaurants = cart.restaurants.filter((r) => selectedRestaurantIds.includes(String(r.restaurant)));
-
-  // Validate if there are selected restaurants
-  if (selectedRestaurants.length === 0) {
-    return res.status(400).json({ status: 'error', message: 'No restaurants selected for order' });
-  }
-
-  // Calculate total order price
-  const totalOrderPrice = selectedRestaurants.reduce((total, restaurant) => {
-    const restaurantTotal = restaurant.items.reduce((subtotal, item) => subtotal + item.price, 0);
-    return total + restaurantTotal;
-  }, 0);
-
-  // Create the order
-  const order = await Order.create({
-    user: userId,
-    restaurants: selectedRestaurants,
-    totalPrice: totalOrderPrice,
+    return order;
   });
 
-  // Remove the selected items from the cart
-  selectedRestaurants.forEach((selectedRestaurant) => {
-    const existingRestaurantIndex = cart.restaurants.findIndex((r) => r.restaurant.equals(selectedRestaurant.restaurant));
-    if (existingRestaurantIndex !== -1) {
-      cart.restaurants.splice(existingRestaurantIndex, 1);
-    }
-  });
+  // Wait for all orders to be created
+  const createdOrders = await Promise.all(orders);
 
-  // Save the updated cart
+  // Clear the cart after placing orders
+  cart.restaurants = [];
+  cart.totalPrice = 0;
   await cart.save();
 
   res.status(201).json({
     status: 'success',
     data: {
-      order,
+      orders: createdOrders,
     },
   });
 });
+
+
