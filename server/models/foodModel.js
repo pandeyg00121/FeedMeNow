@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const slugify = require("slugify");
 // const Restaurant = require("./restaurantModel");
 
 const foodSchema = new mongoose.Schema({
@@ -7,8 +8,15 @@ const foodSchema = new mongoose.Schema({
     type: String,
     required: [true, "A Food must have a name"],
   },
+  slug: String,
   type: {
     type: String,
+    enum :["veg","non-veg"],
+    required: [true, "A Food must have a type"],
+  },
+  category: {
+    type: String,
+    enum :["Beverages","Chinese","Dessert","Fast-food","North-indian","South-indian","Sweets"],
     required: [true, "A Food must have a type"],
   },
   price: {
@@ -38,6 +46,10 @@ const foodSchema = new mongoose.Schema({
   }
 });
 
+foodSchema.pre("save", async function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 
 const Food = mongoose.model("Food", foodSchema);
 module.exports = Food;
