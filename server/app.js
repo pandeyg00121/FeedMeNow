@@ -3,6 +3,7 @@ const path = require("path");
 const morgan = require("morgan");
 var bodyParser = require("body-parser");
 const AppError = require("./utils/appError");
+const cookieParser = require("cookie-parser");
 
 const userRouter = require("./routes/userRoutes");
 const foodRouter = require('./routes/foodRoutes');
@@ -14,9 +15,15 @@ const viewRouter = require('./routes/viewRoutes');
 const app = express();
 //cross site scripting overcome
 app.use(bodyParser.urlencoded({ limit: "10kb", extended: false }));
-
+app.use(cookieParser());
 //for develpment and status code on console
 app.use(morgan("dev"));
+
+app.use((req,res,next)=>{
+  // req.requestTime = new Date.toISOString();
+  console.log(req.cookies);
+  next();
+});
 
 app.use("/api/users", userRouter);
 app.use("/api/foods", foodRouter);

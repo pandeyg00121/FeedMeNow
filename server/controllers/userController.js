@@ -65,5 +65,6 @@ exports.getAllUsers = catchAsync(async (req,res,next)=>{
 });
 
 exports.getMe = (req,res,next)=>{
-    res.send('hyyyyy');
+    req.params.id = req.user.id;
+    next();
 };
