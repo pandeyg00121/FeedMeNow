@@ -14,17 +14,18 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     validate: {
-        validator: function(value) {
-          // Regular expression to match email addresses ending with "@mnnit.ac.in"
-          const emailRegex = /^[a-zA-Z0-9._%+-]+@mnnit\.ac\.in$/;
-          return emailRegex.test(value);
-        },
-        message: props => `${props.value} is not a valid email address ending with @mnnit.ac.in!`
-    }
+      validator: function (value) {
+        // Regular expression to match email addresses ending with "@mnnit.ac.in"
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@mnnit\.ac\.in$/;
+        return emailRegex.test(value);
+      },
+      message: (props) =>
+        `${props.value} is not a valid email address ending with @mnnit.ac.in!`,
+    },
   },
   role: {
     type: String,
-    enum: ["user", "restaurant", "admin"],
+    enum: ["user", "admin"],
     required: [true, "An account must have its type"],
     default: "user",
   },
@@ -48,6 +49,15 @@ const userSchema = new mongoose.Schema({
       },
       message: "Password And Confirm Password Do not match",
     },
+  },
+  address: {
+    type: {
+      type: String,
+      default: "Point",
+      enum: ["Point"],
+    },
+    coordinates: [Number],
+    address: String,
   },
   profilePic: {
     type: String,
@@ -81,19 +91,19 @@ userSchema.methods.correctPassword = async function (
 };
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
-    if (this.passwordChangedAt) {
-      const changedTimestamp = parseInt(
-        this.passwordChangedAt.getTime() / 1000,
-        10
-      );
-  
-      return JWTTimestamp < changedTimestamp;
-      // JWTTimestamp-> time when token issued(100)
-      // changedTimestamp -> time when password changed(200)
-      //return true if pswd changed after token issued time (100<200 )->true
-    }
-    //false means password Not changed
-    return false;
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    return JWTTimestamp < changedTimestamp;
+    // JWTTimestamp-> time when token issued(100)
+    // changedTimestamp -> time when password changed(200)
+    //return true if pswd changed after token issued time (100<200 )->true
+  }
+  //false means password Not changed
+  return false;
 };
 
 userSchema.methods.createPasswordResetToken = function () {

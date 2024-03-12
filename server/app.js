@@ -9,8 +9,8 @@ const userRouter = require("./routes/userRoutes");
 const foodRouter = require('./routes/foodRoutes');
 const restaurantRouter = require('./routes/restaurantRoutes');
 
-const viewRouter = require('./routes/viewRouter');
-const cartRouter = require('./routes/cartRoutes');
+const viewRouter = require('./routes/viewRoutes');
+
 
 const adminRouter = require('./routes/adminRoutes');
 
@@ -30,13 +30,12 @@ app.use((req,res,next)=>{
 
 app.use("/api/users", userRouter);
 app.use("/api/foods", foodRouter);
-app.use("/api/restaurant", restaurantRouter);
-app.use("/api/users/cart", cartRouter);
+app.use("/api/restaurants", restaurantRouter);
 app.use("/api/admin", adminRouter);
 app.use('/',viewRouter);
 
 app.all("*", (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+  next(new AppError(`Can't find ${req.originalUrl} on this server now`, 404));
 });
 
 module.exports = app;

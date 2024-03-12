@@ -2,9 +2,11 @@ const Restaurant = require("./../models/restaurantModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const Food = require("./../models/foodModel");
+
 const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
+
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -55,15 +57,23 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   //finding the restaurant using email and also saving password
-  const resUser = await Restaurant.findOne({ email }).select("+password");
-  // console.log(user);
-  const correct = await resUser.correctPassword(password, resUser.password);
+  const restaurant = await Restaurant.findOne({ email }).select("+password");
 
-  if (!resUser || !correct) {
+  const correct = await restaurant.correctPassword(password, restaurant.password);
+
+  if (!restaurant || !correct) {
     return next(new AppError("Incorrect Email or password", 401));
   }
-  createSendToken(resUser, 200, res);
+  createSendToken(restaurant, 200, res);
 });
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+};
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -73,6 +83,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
+  }else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -84,27 +96,57 @@ exports.protect = catchAsync(async (req, res, next) => {
   //2)Verification of token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  //3) Check if User still Exists
+  //3) Check if restaurant still Exists
   const freshRestaurant = await Restaurant.findById(decoded.id);
   if (!freshRestaurant) {
     return next(
-      new AppError("The user belonging to this token does not exist.", 401)
+      new AppError("The restaurant belonging to this token does not exist.", 401)
     );
   }
-  //4)check if user changed password after JWT was issued
+  //4)check if restaurant changed password after JWT was issued
   if (freshRestaurant.changedPasswordAfter(decoded.iat)) {
     return next(
-      new AppError("User recently changed password!,please log in again", 401)
+      new AppError("restaurant recently changed password!,please log in again", 401)
     );
   }
-  //all 4 steps verified then we grant acess of user to the next chained middleware
+  //all 4 steps verified then we grant acess of restaurant to the next chained middleware
+  res.locals.restaurant = freshRestaurant;
   req.restaurant = freshRestaurant;
   next();
 });
 
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      // 1) verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      // 2) Check if restaurant still exists
+      const currentRestaurant = await Restaurant.findById(decoded.id);
+      if (!currentRestaurant) {
+        return next();
+      }
+
+      // 3) Check if restaurant changed password after the token was issued
+      if (currentRestaurant.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN restaurant
+      res.locals.restaurant = currentRestaurant;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
 exports.dashboard = catchAsync(async (req, res, next) => {
   try {
-    const restaurantId = req.user._id;
+    const restaurantId = req.restaurant.id;
 
     // Fetch restaurant details
     const restaurant = await Restaurant.findById(restaurantId);
@@ -123,9 +165,9 @@ exports.dashboard = catchAsync(async (req, res, next) => {
       details: {
         name: restaurant.name,
         type: restaurant.type,
-        address: restuarant.address,
+        // address: restuarant.address,
         email: restaurant.email,
-        profilePic: restaurant.profilePic,
+        // profilePic: restaurant.profilePic,
       },
       isActive,
       menu,
@@ -146,6 +188,79 @@ exports.dashboard = catchAsync(async (req, res, next) => {
   }
 });
 
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Get restaurant on POSTed Email
+  const restaurant = await Restaurant.findOne({ email: req.body.email });
+
+  if (!restaurant) {
+    return next(new AppError("There is no restaurant with email address", 404));
+  }
+
+  // 2) Generate token
+  const resetToken = restaurant.createPasswordResetToken();
+  await restaurant.save({ validateBeforeSave: false });
+
+  //3) Send it to restaurant's email
+  const resetURL = `${req.protocol}://127.0.0.1:5500/api/restaurants/resetPassword/${resetToken}`;
+  console.log(resetURL);
+  const message = `Forgot your password? Submit a PATCH request with your new password and 
+  passwordConfirm to:${resetURL}.\n If not prompted ignore this message`;
+
+  res.status(200).json({
+      status: "success",
+      mesaage: message,
+    });
+   
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  //1)Get restaurant based on the token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const restaurant = await Restaurant.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gte: Date.now() },
+  });
+  //2)If token has not expired and restaurant exists then set the new password
+  if (!restaurant) {
+    return next(new AppError("Token is invalid or expired", 400));
+  }
+  restaurant.password = req.body.password;
+  restaurant.passwordConfirm = req.body.passwordConfirm;
+  //if we update the password we make reset token undefined
+  restaurant.passwordResetToken = undefined;
+
+  await restaurant.save();
+
+  //3)update changed password property for the restaurant
+  //updated changedPassword field in DB using pre save method of mongoose
+
+  //4) log the restaurant in send JWT
+  createSendToken(restaurant, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get restaurant from collection
+  const restaurant = await Restaurant.findById(req.restaurant.id).select("+password");
+
+  // 2) Check if POSTed current password is correct
+  if (!(await restaurant.correctPassword(req.body.passwordCurrent, restaurant.password))) {
+    return next(new AppError("Your current password is wrong.", 401));
+  }
+
+  // 3) If so, update password
+  restaurant.password = req.body.password;
+  restaurant.passwordConfirm = req.body.passwordConfirm;
+  await restaurant.save();
+  // restaurant.findByIdAndUpdate will NOT work as intended!
+
+  // 4) Log restaurant in, send JWT
+  createSendToken(restaurant, 200, res);
+});
 
 exports.deleteRestaurant = catchAsync(async (req,res,next)=>{  
 
@@ -176,6 +291,27 @@ exports.getRestaurant =  catchAsync(async (req,res,next)=>{
   });
 });
 
+exports.getMe = (req, res, next) => {
+  req.params.id = req.restaurant.id;
+  next();
+};
+
+exports.closeMe = catchAsync(async (req, res, next) => {
+  await Restaurant.findByIdAndUpdate(req.restaurant.id, { active: false });
+
+  res.status(204).json({
+    message: "Your Restaurant is now closed successfully",
+  });
+});
+
+exports.openMe = catchAsync(async (req, res, next) => {
+  await Restaurant.findByIdAndUpdate(req.restaurant.id, { active: true });
+
+  res.status(204).json({
+    message: "Your Restaurant is now opened successfully",
+  });
+});
+
 exports.getAllRestaurants = catchAsync(async (req,res,next)=>{ 
   const allRestaurants= await Restaurant.find({ active: true });
   
@@ -193,6 +329,7 @@ exports.addItem= catchAsync(async (req, res, next) => {
     const newFoodItem = await Food.create({
         name: req.body.name,
         type: req.body.type,
+        category:req.body.category,
         price: req.body.price,
         description: req.body.description,
         // image: req.body.image,
