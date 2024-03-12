@@ -1,6 +1,6 @@
-import React from 'react';
-import {Box, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, FormControl, HStack,Input, VStack, useDisclosure,Image,Stack,Text} from "@chakra-ui/react"
-import { Link } from 'react-router-dom';
+import {useState,useEffect} from 'react';
+import {Box, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, HStack,Input, VStack, useDisclosure,Image,Stack,Text} from "@chakra-ui/react"
+import { Link,useNavigate,useLocation } from 'react-router-dom';
 import {RiDashboardFill, RiLogoutBoxLine, RiMenu5Fill} from "react-icons/ri";
 import { FaSearch } from "react-icons/fa";
 import logo from "../../assets/logo.jfif"
@@ -13,6 +13,8 @@ const LinkButton=({url="/",title="Home",onClose})=>(
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [searchTerm,setSearchTerm]=useState('');
+  const location=useLocation();
   const isAuthenticated=true;
     const user={
         _id:"123456890qwerty",
@@ -24,7 +26,22 @@ const Navbar = () => {
       console.log("logout");
       onClose();
   }
-
+  const navigate=useNavigate();
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+    const urlParams=new URLSearchParams(window.location.search);
+    urlParams.set('searchTerm',searchTerm);
+    const searchQuery=urlParams.toString();
+    navigate(`/search?${searchQuery}`);
+  }
+  useEffect(()=>{
+    const urlParams=new URLSearchParams(location.search);
+    const searchTermFromUrl=urlParams.get('searchTerm');
+    if(searchTermFromUrl){
+      setSearchTerm('');
+    }
+  },[location.search])
+  
   return (
     <HStack p={2} justifyContent={"space-between"} bgColor="rgba(0,0,0,0.6)" width="100%">
       {/*Left Side*/}
@@ -35,10 +52,10 @@ const Navbar = () => {
       </Box>
       {/*Center*/}
       <HStack alignItems={"center"}>
-      <FormControl>
+      <form onSubmit={handleSubmit}>
       <Input
         type="text"
-        id="search"
+        value={searchTerm}
         placeholder="Search for food..."
         sx={{"&::placeholder":{color:"black"}}}
         size={["sm","md"]}
@@ -50,11 +67,12 @@ const Navbar = () => {
         _focus={{bg:"rgba(245, 247, 248,0.8)"}}
         textColor="black"
         borderRadius="lg"
+        onChange={(e)=>setSearchTerm(e.target.value)}
       />
-      </FormControl>
-      <Link to="/search">
+      <Button variant={"ghost"} type='submit'>
       <FaSearch size={23} color='white'/>
-      </Link>
+      </Button>
+      </form>
       </HStack>
       {/*Right Side*/}
       <Stack direction="col">
