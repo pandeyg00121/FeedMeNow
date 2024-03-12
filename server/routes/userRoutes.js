@@ -8,11 +8,19 @@ router.use(express.json());
 
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
+router.get('/logout', authController.logout);
+
 router.post("/forgotPassword",authController.forgotPassword);
 
 router.use(authController.protect); 
 
-router.get("/me", userController.getMe);
+router.get("/me", userController.getMe, userController.getUser);
+// router.post('/updateMe',)
+// router.post('/changePassword')
+//router.get('/prevOrders)`
+//router.get('/currentOrders)
+//router.get('/myReviews')
+
 
 module.exports = router;
 
