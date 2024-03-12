@@ -1,81 +1,64 @@
-import { Box, Grid,Heading,TableContainer,Table,TableCaption,Thead,Tr,Th,Tbody,Td,Image,HStack,Button,useDisclosure} from '@chakra-ui/react'
-import {RiDeleteBin7Fill,RiAddCircleFill} from "react-icons/ri"
-import {Link} from "react-router-dom";
-import {useState} from 'react'
+import { Box, Grid,Heading,TableContainer,Table,TableCaption,Thead,Tr,Th,Tbody,Td,Button,useDisclosure,VStack,Select} from '@chakra-ui/react'
+import {useState,useEffect} from 'react'
 import cursor from "../../../assets/cursor red.png"
 import Sidebar from './Sidebar'
 import Footer from '../../Layout/Footer'
 
 const ManageOrders = () => {
-    
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const [current,setCurrent]=useState(false);
 
     const data=[{
         _id:1,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
         name:"Burger",
         type:"non-veg",
-        description:"very tasty burger",
         price:"100",
-        restaurant:"Tirath",
-        rating:4.5,
+        payment:"Online"
       },{
         _id:2,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
         name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
+        type:"non-veg",
         price:"100",
-        restaurant:"Tirath",
-        rating:3,
+        payment:"Online"
       },
       {
         _id:3,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
         name:"Burger",
         type:"veg",
-        description:"very tasty burger",
         price:"100",
-        restaurant:"Tirath",
-        rating:2,
+        payment:"Online"
       },
       {
         _id:4,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
         name:"Burger",
         type:"veg",
-        description:"very tasty burger",
         price:"100",
-        restaurant:"Tirath",
-        rating:1.5,
+        payment:"Online"
       },
       {
         _id:5,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
         name:"Burger",
         type:"veg",
-        description:"very tasty burger",
         price:"100",
-        restaurant:"Tirath",
-        rating:3,
+        payment:"Online"
       },
       {
         _id:6,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
         name:"Burger",
         type:"veg",
-        description:"very tasty burger",
         price:"100",
-        restaurant:"Tirath",
-        rating:5,
-      }]
+        payment:"Online"
+      }
+    ]
 
-      const [items,setItems]=useState(data);
+      const [items,setItems]=useState([]);
 
-      const deleteItem = (id) => {
-        const updatedItems = items.filter((item) => item._id !== id);
-        setItems(updatedItems);
-      };
+      useEffect(()=>{
+         setItems(data);
+      },[data])
+
+      const toggleHandler=()=>{
+        setCurrent(!current);
+      }
 
   return (
     <>
@@ -85,32 +68,58 @@ const ManageOrders = () => {
       <Box
       p={["0","8"]} overflowX={"auto"} 
       >
-      <HStack>
-      <Heading textTransform={'uppercase'} children="All Menu Items" my={"2"} textAlign={["center","left"]}/>
-      <LinkButton Icon={RiAddCircleFill} text={"Add New Item"} url="additem" />
-      </HStack>
+      <VStack>
+      <Heading textTransform={'uppercase'} children={current?"Current Orders":"Previous Orders"} my={"2"} textAlign={["center","left"]}/>
+      <Button bgColor={current?"gray":"green"}  children={current?" View Previous Orders":" View Current Orders"} onClick={toggleHandler}/>
+      </VStack>
+      {
+       current?(
       <TableContainer w={["100vw","full"]} boxShadow={'-1px 0 10px rgba(255,0,0,0.5)'} borderRadius={"lg"} borderColor="rgba(255,0,0,0.7)"  p={5} mt={8}>
         <Table variant={"simple"} size={"lg"}>
           <TableCaption>All available items in the menu</TableCaption>
           <Thead>
             <Tr>
-              <Th fontSize={"lg"}>Id</Th>
-              <Th fontSize={"lg"}>Image</Th>
-              <Th fontSize={"lg"}>name</Th>
-              <Th fontSize={"lg"}>Type</Th>
-              <Th isNumeric fontSize={"lg"}>Price</Th>
-              <Th isNumeric fontSize={"lg"}>Actions</Th>
+              <Th fontSize={"md"}>Order Id</Th>
+              <Th fontSize={"md"}>name</Th>
+              <Th fontSize={"md"}>Type</Th>
+              <Th fontSize={"md"}>Payment Method</Th>
+              <Th isNumeric fontSize={"md"}>Price</Th>
+              <Th isNumeric fontSize={"md"}>Status</Th>
             </Tr>
           </Thead>
           <Tbody>
            {
             items.map(item=>(
-              <Row  key={item._id} item={item} deleteItem={deleteItem}/>
+              <Row  key={item._id} item={item}/>
             ))
            }
           </Tbody>
         </Table>
       </TableContainer>
+       ):(
+        <TableContainer w={["100vw","full"]} boxShadow={'-1px 0 10px rgba(255,0,0,0.5)'} borderRadius={"lg"} borderColor="rgba(255,0,0,0.7)"  p={5} mt={8}>
+        <Table variant={"simple"} size={"lg"}>
+          <TableCaption>All available items in the menu</TableCaption>
+          <Thead>
+            <Tr>
+              <Th fontSize={"md"}>Order Id</Th>
+              <Th fontSize={"md"}>name</Th>
+              <Th fontSize={"md"}>Type</Th>
+              <Th fontSize={"md"}>Payment Method</Th>
+              <Th isNumeric fontSize={"md"}>Price</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+           {
+            items.map(item=>(
+              <Row2  key={item._id} item={item}/>
+            ))
+           }
+          </Tbody>
+        </Table>
+      </TableContainer>
+       )
+      }
       </Box>
       <Sidebar/>
     </Grid>
@@ -119,42 +128,35 @@ const ManageOrders = () => {
   )
 }
 
-function Row({item,deleteItem}){
-    const handleDelete=()=>{
-        deleteItem(item._id);
-    }
+function Row({key,item}){
     return(
       <Tr>
         <Td fontWeight={"bold"}>#{item._id}</Td>
-        <Td>
-        <Image src={item.image} maxHeight={"80px"} maxWidth={"80px"}/>
-        </Td>
         <Td fontWeight={"bold"}>{item.name}</Td>
         <Td textTransform={"uppercase"} fontWeight={"bold"} color={item.type==="veg"?"green":"red"}>{item.type}</Td>
+        <Td fontWeight={"bold"}>{item.payment}</Td>
         <Td isNumeric fontWeight={"bold"}>₹{item.price}</Td>
         <Td isNumeric>
-         <HStack
-         justifyContent={"flex-end"}
-         >
-          <Button  variant={"outline"} color={"green.500"}>Edit Item</Button>
-          <Button  color={"red.500"} onClick={handleDelete}>
-            <RiDeleteBin7Fill/>
-          </Button>
-         </HStack>
+         <Select variant={"outline"}  width={"120px"} focusBorderColor='rgba(255,0,0,0.6)' >
+         <option >Pending</option>
+         <option >Preparing</option>
+         <option >Delivered</option>
+         </Select>
         </Td>
       </Tr>
     )
   }
 
-  function LinkButton({url,Icon,text,active}){
-    return (
-        <Link to={`/restaurant/${url}`}>
-        <Button fontSize={"larger"} variant={"ghost"} colorScheme={active?'red':''}>
-           <Icon style={{margin:'4px'}}/> 
-           {text}
-        </Button>
-      </Link>
+  function Row2({key,item}){
+    return(
+      <Tr>
+        <Td fontWeight={"bold"}>#{item._id}</Td>
+        <Td fontWeight={"bold"}>{item.name}</Td>
+        <Td textTransform={"uppercase"} fontWeight={"bold"} color={item.type==="veg"?"green":"red"}>{item.type}</Td>
+        <Td fontWeight={"bold"}>{item.payment}</Td>
+        <Td isNumeric fontWeight={"bold"}>₹{item.price}</Td>
+      </Tr>
     )
-}
+  }
 
 export default ManageOrders;

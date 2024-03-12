@@ -5,6 +5,7 @@ import RestaurantDashboard from './components/Restaurant/Admin/RestaurantDashboa
 import ManageItems from './components/Restaurant/Admin/ManageItems';
 import AddNewItem from './components/Restaurant/Admin/AddNewItem';
 import ManageOrders from './components/Restaurant/Admin/ManageOrders';
+import Search from './components/Search/Search';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path='/restaurant/manageitems' element={<ManageItems/>}/>
         <Route path='/restaurant/additem' element={<AddNewItem/>}/>
         <Route path='/restaurant/manageorders' element={<ManageOrders/>}/>
+        <Route path='/search' element={<Search/>}/>
       </Routes>
      
     </BrowserRouter>
