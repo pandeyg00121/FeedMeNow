@@ -7,7 +7,7 @@ import logo from "../../assets/logo.jfif"
 
 const LinkButton=({url="/",title="Home",onClose})=>(
   <Link onClick={onClose} to={url}>
-             <Button variant={"ghost"}>{title}</Button>
+             <Button variant={"ghost"} color={"yellow.600"} fontWeight={"bold"} size={"md"}>{title}</Button>
             </Link>
 )
 
@@ -17,7 +17,7 @@ const Navbar = () => {
     const user={
         _id:"123456890qwerty",
         name:"Pranay Pandey",
-        role:"user",
+        role:"restaurant",
         profilePic:"https://media.licdn.com/dms/image/D4D03AQGM3TYJYte9bA/profile-displayphoto-shrink_800_800/0/1687941627773?e=1715817600&v=beta&t=59SDcTROZWoNY8O7S3hTWYqGdqvgUMjWpHB2i5HR95s"
     }
     const logoutHandler=()=>{
@@ -26,7 +26,7 @@ const Navbar = () => {
   }
 
   return (
-    <HStack p={2} justifyContent={"space-between"} bgColor="rgba(0,0,0,0.6)">
+    <HStack p={2} justifyContent={"space-between"} bgColor="rgba(0,0,0,0.6)" width="100%">
       {/*Left Side*/}
       <Box>
       <Link to={"/"}>
@@ -34,7 +34,7 @@ const Navbar = () => {
       </Link>
       </Box>
       {/*Center*/}
-      <HStack >
+      <HStack alignItems={"center"}>
       <FormControl>
       <Input
         type="text"
@@ -86,7 +86,7 @@ const Navbar = () => {
                         
                         {
                             user && user.role==="admin" && <Link onClick={onClose} to="/admin/dashboard">
-                                <Button colorScheme='purple' variant={"ghost"}>
+                                <Button colorScheme='purple' variant={"ghost"} fontWeight={"bold"} size={"md"}>
                                 <RiDashboardFill style={{margin:"4px"}}/>
                                    Dashboard 
                                 </Button>
@@ -94,13 +94,13 @@ const Navbar = () => {
                         }
                         {
                             user && user.role==="restaurant" && <Link onClick={onClose} to="/restaurant/dashboard">
-                                <Button colorScheme='purple' variant={"ghost"}>
+                                <Button colorScheme='purple' variant={"ghost"} fontWeight={"bold"} size={"md"}>
                                 <RiDashboardFill style={{margin:"4px"}}/>
                                    Dashboard 
                                 </Button>
                             </Link>
                         }
-                        <Button variant={"ghost"} onClick={logoutHandler}>
+                        <Button variant={"ghost"} onClick={logoutHandler} color={"red.500"}  fontWeight={"bold"} size={"md"}>
                                 <RiLogoutBoxLine/>
                                 Logout
                             </Button>

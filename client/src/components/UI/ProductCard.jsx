@@ -30,7 +30,7 @@ function ProductCard({ product }) {
           </Text>
           </Box>
           <Box >
-          <Text color="white" fontSize="12px" backgroundColor={product.type==="veg"?"green":"red"} width={"60px"} rounded={"full"} textAlign={"center"} p={1.5}>
+          <Text color="white" fontSize="12px" backgroundColor={product.type==="veg"?"green.300":"red.400"} width={product.type==="veg"?"30px":"55px"} textAlign={"center"} p={1}>
             {product.type}
           </Text>
           </Box>
