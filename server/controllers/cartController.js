@@ -97,6 +97,7 @@ exports.addItemToCart = catchAsync(async (req, res, next) => {
 exports.removeItemFromCart = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const  {foodId}  = req.body;
+  
   const food = await Food.findOne({ _id: foodId });
   const restaurantId = food.restaurant;
 

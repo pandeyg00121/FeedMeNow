@@ -187,7 +187,7 @@ exports.getAllRestaurants = catchAsync(async (req,res,next)=>{
       }
 
     });
-    
+});   
 
 exports.addItem= catchAsync(async (req, res, next) => {
     const newFoodItem = await Food.create({
