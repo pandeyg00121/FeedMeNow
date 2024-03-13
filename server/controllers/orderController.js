@@ -3,30 +3,28 @@ const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const Cart = require("./../models/cartModel");
 
-
 // Place an order
 exports.placeOrder = catchAsync(async (req, res, next) => {
   const userId = req.user.id;
 
   // Find the user's cart
-  const cart = await Cart.findOne({ user: userId }).populate('restaurants.restaurant', 'name');
+  const cart = await Cart.findOne({ user: userId }).populate(
+    "restaurants.restaurant",
+    "name"
+  );
 
   if (!cart) {
-    return next(new AppError('Cart not found', 404));
+    return next(new AppError("Cart not found", 404));
   }
 
   // Create an order for each restaurant in the cart
   const orders = cart.restaurants.map(async (restaurant) => {
     const order = await Order.create({
       user: userId,
-      restaurants: [
-        {
-          restaurant: restaurant.restaurant,
-          items: restaurant.items,
-          rpice: restaurant.rPrice,
-          status: 'Pending',
-        },
-      ],
+      restaurant: restaurant.restaurant,
+      items: restaurant.items,
+      rpice: restaurant.rPrice,
+      status: "Pending",
     });
 
     return order;
@@ -41,11 +39,9 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
   await cart.save();
 
   res.status(201).json({
-    status: 'success',
+    status: "success",
     data: {
       orders: createdOrders,
     },
   });
 });
-
-
