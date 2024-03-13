@@ -12,11 +12,13 @@ const foodSchema = new mongoose.Schema({
   type: {
     type: String,
     enum :["veg","non-veg"],
+    default: "veg",
     required: [true, "A Food must have a type"],
   },
   category: {
     type: String,
     enum :["Beverages","Chinese","Dessert","Fast-food","North-indian","South-indian","Sweets"],
+    default:"North-indian",
     required: [true, "A Food must have a type"],
   },
   price: {
@@ -26,6 +28,7 @@ const foodSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, "A Food must have a description"],
+    default:"good food",
     minLength: 8,
     select: false,
   },
