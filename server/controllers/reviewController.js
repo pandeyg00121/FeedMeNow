@@ -44,11 +44,12 @@ exports.myReviews = catchAsync(async (req, res, next) => {
   });
 });
 
+//Restaurant can see their reviews on delivered orders
 exports.resReviews= catchAsync(async(req,res,next)=>{
-    const resId = req.params.restaurantId; 
+    const resId = req.restaurant.id; 
 
     // Finding orders associated with the restaurant
-    const orders = await Order.find({ 'restaurants.restaurant': resId });
+    const orders = await Order.find({ restaurant: resId });
   
     // Extracting order ids
     const orderIds = orders.map(order => order._id);

@@ -45,3 +45,89 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+//User can view previous orders
+exports.prevOrders=catchAsync(async(req,res,next)=>{
+  const userId = req.user.id;
+
+  const orders = await Order.find({ user: userId, status: 'Delivered' });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      orders,
+    },
+  });
+
+});
+
+//User can view current orders
+exports.currOrders=catchAsync(async(req,res,next)=>{
+  const userId = req.user.id;
+
+  const orders = await Order.find({ user: userId, status: { $ne: 'Delivered' } });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      orders,
+    },
+  });
+
+});
+
+//Restaurant can view all previous orders
+exports.resPrevOrders=catchAsync(async(req,res,next)=>{
+  const restaurantId = req.restaurant.id; 
+
+  const orders = await Order.find({ restaurant: restaurantId, status: 'Delivered' });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      orders,
+    },
+  });
+});
+
+//Restaurant can view current pending orders
+exports.resCurrOrders=catchAsync(async(req,res,next)=>{
+  const restaurantId = req.restaurant.id; 
+
+  const orders = await Order.find({ restaurant: restaurantId, status: { $ne: 'Delivered' } });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      orders,
+    },
+  });
+});
+
+//Restaurant can change order status
+exports.updateOrderStatus=catchAsync(async(req,res,next)=>{
+  // const restaurantId = req.restaurant.id; 
+  // const orderId = req.params.orderId;
+  const { status,orderId } = req.body;
+
+  // Check if the status is valid
+  const validStatuses = ['Pending', 'Preparing', 'Out For Delivery' , 'Delivered'];
+  if (!validStatuses.includes(status)) {
+    return next(new AppError('Invalid status', 400));
+  }
+
+  // Update the order status
+  const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+
+  if (!order) {
+    return next(new AppError('Order not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      order,
+    },
+  });
+
+});
