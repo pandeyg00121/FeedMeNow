@@ -15,11 +15,13 @@ import dessert from "../../assets/categories/dessert.jpg"
 import fastfood from "../../assets/categories/fast food.jpg"
 import north from "../../assets/categories/north indian.jpg"
 import south from "../../assets/categories/south indian.jpg"
+import { useGetFoodsQuery } from '../../redux/api';
 
 const Home = () => {
   SwiperCore.use([Navigation]);
   const [isLargerThan768]=useMediaQuery("(min-width:768px)")
-  console.log(isLargerThan768);
+  const {isLoading,isError,isSuccess,data,error} = useGetFoodsQuery("");
+  console.log(isLoading,isError,isSuccess,data,error);
 
   const categories=[{
       name:"Chinese",
