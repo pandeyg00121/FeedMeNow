@@ -19,7 +19,7 @@ export default Sidebar;
 function LinkButton({url,Icon,text,active}){
     return (
         <Link to={`/restaurant/${url}`}>
-        <Button fontSize={"larger"} variant={"ghost"} colorScheme={active?'red':''}>
+        <Button fontSize={"larger"} variant={"ghost"} colorScheme={active?'red':'white'}>
            <Icon style={{margin:'4px'}}/> 
            {text}
         </Button>

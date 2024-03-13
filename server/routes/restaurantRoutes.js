@@ -9,14 +9,21 @@ router.use(express.json());
 
 router.post("/signup", restaurantController.signup);
 router.post("/login", restaurantController.login);
+router.get('/logout', restaurantController.logout);
+router.post("/forgotPassword",restaurantController.forgotPassword);
+router.patch("/resetPassword/:token", restaurantController.resetPassword);
 
 router.use(restaurantController.protect); 
 
 router.get('/dashboard',restaurantController.dashboard);
 router.post("/addItem", restaurantController.addItem);
-router.get('/reviews' , reviewController.resReviews);
 
-// router.post('/changePassword')
+router.patch("/updateMyPassword",restaurantController.updatePassword);
+router.get("/me", restaurantController.getMe,restaurantController.getRestaurant);
+// router.patch("/updateMe", userController.updateMe);
+router.patch("/closeMe", restaurantController.closeMe);
+router.patch("/openMe", restaurantController.openMe);
+
 //router.get('/deliveredOrders)
 //router.get('/currentOrders)
 

@@ -161,17 +161,76 @@ exports.restrictTo = (...roles) => {
   };
 };
 
-exports.forgotPassword = async (req, res, next) => {
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user on POSTed Email
   const user = await User.findOne({ email: req.body.email });
+
   if (!user) {
     return next(new AppError("There is no user with email address", 404));
   }
 
+  // 2) Generate token
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://127.0.0.1:3000/api/v1/users/resetPassword/${resetToken}`;
+  //3) Send it to user's email
+  const resetURL = `${req.protocol}://127.0.0.1:5500/api/users/resetPassword/${resetToken}`;
   console.log(resetURL);
   const message = `Forgot your password? Submit a PATCH request with your new password and 
-    passwordConfirm to:${resetURL}.\n If not prompted ignore this message`;
-};
+  passwordConfirm to:${resetURL}.\n If not prompted ignore this message`;
+
+  res.status(200).json({
+      status: "success",
+      mesaage: message,
+    });
+   
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  //1)Get user based on the token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gte: Date.now() },
+  });
+  //2)If token has not expired and user exists then set the new password
+  if (!user) {
+    return next(new AppError("Token is invalid or expired", 400));
+  }
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  //if we update the password we make reset token undefined
+  user.passwordResetToken = undefined;
+
+  await user.save();
+
+  //3)update changed password property for the user
+  //updated changedPassword field in DB using pre save method of mongoose
+
+  //4) log the user in send JWT
+  createSendToken(user, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  const user = await User.findById(req.user.id).select("+password");
+
+  // 2) Check if POSTed current password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Your current password is wrong.", 401));
+  }
+
+  // 3) If so, update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  // User.findByIdAndUpdate will NOT work as intended!
+
+  // 4) Log user in, send JWT
+  createSendToken(user, 200, res);
+});
+

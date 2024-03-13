@@ -5,7 +5,7 @@ import {TiSocialInstagramCircular} from "react-icons/ti"
 
 const Footer = () => {
   return (
-    <Box padding={'5'} bg="rgba(211,211,211,0.92)" minH={'25vh'}>
+    <Box padding={'5'} bg="rgba(211,211,211,0.92)" minH={'25vh'} width={"100%"}>
       <HStack direction={["column","row"]}>
       <VStack alignItems={["center","flex-start"]} width={"full"}>
        <Heading children="All Rights Reserved ©" color={"black"} size={"md"}/>
