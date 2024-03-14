@@ -54,6 +54,7 @@ const changeImageHandler=(e)=>{
       image:image
     }
     newFoodItem(foodItem);
+    
     setName("");
     setType("");
     setCategory("");
