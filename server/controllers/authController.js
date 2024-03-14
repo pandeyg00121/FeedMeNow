@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
+const axios = require('axios');
 
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
@@ -36,21 +37,33 @@ const createSendToken = (user, statusCode, res) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const username = req.body.name.split(" ")[0];
   const gender = req.body.gender;
+  const userEmail=req.body.email;
 
   const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
   const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
 
+  const apiUrl = `https://api-bdc.net/data/email-verify?emailAddress=${userEmail}&key=${process.env.BIG_DATA_API_KEY}`;
+  const response = await axios.get(apiUrl);
+  console.log(response.data);
+
+  if(!response.data.isValid)
+  return next(new AppError("Please Provide valid Email", 400));
+
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
-    role: req.body.role,
     gender: req.body.gender,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    location:req.body.location,
     profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
     accountCreatedAt: Date.now(),
   });
+  const verificationCode = newUser.createVerificationCode();
+  await newUser.save({ validateBeforeSave: false });
 
+  const redirectUrl = `${req.protocol}://127.0.0.1:5500/api/users/verifyemail/${verificationCode}`;
+  console.log(redirectUrl);
   createSendToken(newUser, 201, res);
 });
 
@@ -68,15 +81,25 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !correct) {
     return next(new AppError("Incorrect Email or password", 401));
   }
+  console.log(user.active);
+
+  if (user.active) {
+    return next(
+      new AppError(
+        `Your Email is not verified yet Check your ${user.email} for link `,
+        401
+      )
+    );
+  }
   createSendToken(user, 200, res);
 });
 
 exports.logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
+  res.cookie("jwt", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
   });
-  res.status(200).json({ status: 'success' });
+  res.status(200).json({ status: "success" });
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -180,10 +203,30 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   passwordConfirm to:${resetURL}.\n If not prompted ignore this message`;
 
   res.status(200).json({
-      status: "success",
-      mesaage: message,
-    });
-   
+    status: "success",
+    mesaage: message,
+  });
+});
+
+exports.verifyEmailHandler = catchAsync(async (req, res, next) => {
+  //1)Get user based on the code
+  const verificationCode = crypto
+    .createHash("sha256")
+    .update(req.params.verificationCode)
+    .digest("hex");
+
+  const user = await User.findOne({
+    verificationCode,
+  });
+
+  if (!user) {
+    return next(new AppError("Invalid Registration Link...", 400));
+  }
+  user.active = true;
+  user.verificationCode = null;
+  // await user.save({ validateBeforeSave: false });
+  //4) log the user in send JWT
+  createSendToken(user, 200, res);
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
@@ -233,4 +276,3 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 4) Log user in, send JWT
   createSendToken(user, 200, res);
 });
-

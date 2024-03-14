@@ -2,10 +2,56 @@ const Restaurant = require("./../models/restaurantModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const Food = require("./../models/foodModel");
-
+const axios = require('axios');
 const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
+const multer =require('multer');
+// const sharp= require('sharp');
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/restaurants');
+  },
+  filename: (req, file, cb) => {
+    // restaurant-80980d0s9089d-333232325689.jpeg
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `restaurant-${req.restaurant.id}-${Date.now()}.${ext}`);
+  }
+});
+
+// const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images.', 400), false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadRestaurantPhotos = upload.array('images',3);
+
+exports.resizeRestaurantImages = catchAsync(async (req, res, next) => {
+  if ( !req.files) return next();
+
+  // 2) Images
+  req.body.images = [];
+
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `restaurant-${req.restaurant.id}-${Date.now()}-${i + 1}.jpeg`;
+      req.body.images.push(filename);
+    })
+  );
+    // console.log(req.body.images);
+  next();
+});
+
 
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -35,12 +81,20 @@ const createSendToken = (restaurant, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+
+  const restaurantEmail=req.body.email;
+  const apiUrl = `https://api-bdc.net/data/email-verify?emailAddress=${restaurantEmail}&key=${process.env.BIG_DATA_API_KEY}`;
+  const response = await axios.get(apiUrl);
+  // console.log(response.data);
+
+  if(!response.data.isValid)
+  return next(new AppError("Please Provide valid Email", 400));
+
   const newRestaurant = await Restaurant.create({
     name: req.body.name,
-    address: req.body.address,
     email: req.body.email,
     type: req.body.type,
-    //   ownerName: req.body.owner,
+    location:req.body.location,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     accountCreatedAt: Date.now(),
@@ -144,7 +198,7 @@ exports.isLoggedIn = async (req, res, next) => {
   }
   next();
 };
-exports.dashboard = catchAsync(async (req, res, next) => {
+exports.manageItems = catchAsync(async (req, res, next) => {
   try {
     const restaurantId = req.restaurant.id;
 
@@ -212,6 +266,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       mesaage: message,
     });
    
+});
+
+exports.dashboard = catchAsync(async (req, res, next) => {
+  res.send('hello from dashboard');
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
@@ -345,6 +403,43 @@ exports.addItem= catchAsync(async (req, res, next) => {
       });
   });
 
+  const filterObj = (obj, ...allowedFields) => {
+    const newobj = {};
+    Object.keys(obj).forEach((el) => {
+      if (allowedFields.includes(el)) newobj[el] = obj[el];
+    });
+    return newobj;
+  };
+
+  exports.updateImages = catchAsync(async (req, res, next) => {
+  
+    const files = req.files;
+    if(!files)
+    return next();
+    console.log(files);
+    // console.log(req.body);
+    const filenames = files.map(file => file.filename);
+    //1) Create error if user POSTs password data
+    if (req.body.password || req.body.passwordConfirm) {
+      return next(
+        new AppError(
+          "This route is not for password update.Please use update password",
+          400
+        )
+      );
+    }
+
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.restaurant.id, { $set: { images: filenames } },{
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: "success",
+      data: {
+        restaurant: updatedRestaurant,
+      },
+    });
+  });
 
 exports.getAllPendingRestaurants = catchAsync(async (req,res,next)=>{ 
   const allPendingRestaurants= await Restaurant.find({ active: false });

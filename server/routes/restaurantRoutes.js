@@ -1,7 +1,8 @@
 const express = require('express');
-
+// const multer =require('multer');
 const restaurantController = require("./../controllers/restaurantController");
 const authController = require("./../controllers/authController");
+// const upload = multer({dest: 'public/img/restaurants'});
 
 const router = express.Router();
 router.use(express.json());
@@ -15,11 +16,14 @@ router.patch("/resetPassword/:token", restaurantController.resetPassword);
 router.use(restaurantController.protect); 
 
 router.get('/dashboard',restaurantController.dashboard);
+router.get('/manageItems',restaurantController.manageItems);
 router.post("/addItem", restaurantController.addItem);
+
+router.patch('/manageOrders/current/:id',);
 
 router.patch("/updateMyPassword",restaurantController.updatePassword);
 router.get("/me", restaurantController.getMe,restaurantController.getRestaurant);
-// router.patch("/updateMe", userController.updateMe);
+router.patch("/updateMe",  restaurantController.uploadRestaurantPhotos,restaurantController.resizeRestaurantImages ,restaurantController.updateImages);
 router.patch("/closeMe", restaurantController.closeMe);
 router.patch("/openMe", restaurantController.openMe);
 
