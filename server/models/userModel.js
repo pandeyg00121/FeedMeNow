@@ -36,12 +36,14 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
+    select:false,
     required: [true, "A User must have a password"],
     minLength: 8,
     select: false,
   },
   passwordConfirm: {
     type: String,
+    select:false,
     required: [true, "Please Confirm Your Password"],
     validate: {
       validator: function (el) {
@@ -50,14 +52,15 @@ const userSchema = new mongoose.Schema({
       message: "Password And Confirm Password Do not match",
     },
   },
-  address: {
+  location: {
     type: {
       type: String,
-      default: "Point",
-      enum: ["Point"],
+      default: 'Point',
+      enum: ['Point']
     },
     coordinates: [Number],
     address: String,
+    description: String
   },
   profilePic: {
     type: String,
@@ -66,13 +69,19 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  verificationCode:{
+    type:String,
+    select:false,
+  },
   active: {
     type: Boolean,
-    default: true,
+    default: false,
     select: false,
   },
   accountCreatedAt: Date,
 });
+
+userSchema.index({ Location : '2dsphere'});
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -119,6 +128,18 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
+};
+
+userSchema.methods.createVerificationCode = function () {
+
+  const verificationCode = crypto.randomBytes(32).toString("hex");
+  //hashing  the token before savin to DB by sha256 algo
+  this.verificationCode = crypto
+    .createHash("sha256")
+    .update(verificationCode)
+    .digest("hex");
+
+  return verificationCode;
 };
 
 const User = mongoose.model("User", userSchema);

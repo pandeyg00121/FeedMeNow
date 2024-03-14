@@ -30,4 +30,5 @@ router.get("/allRes/:id",restaurantController.getRestaurant)
 // router.patch(userController.updateUser)
 router.delete("/allRes/:id",restaurantController.deleteRestaurant);
 
+router.get("/allReviews",)
 module.exports = router;

@@ -7,7 +7,7 @@ router.use(express.json());
 
 router.use(authController.protect); 
 
-router.get("/myCart", cartController.getCart);
+router.get("/", cartController.getCart);
 router.post("/addItem", cartController.addItemToCart);
 router.post("/removeItem", cartController.removeItemFromCart);
 router.post("/updateItem", cartController.updateCartItemQuantity);

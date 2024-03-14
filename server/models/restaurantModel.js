@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const slugify = require("slugify");
+const crypto = require("crypto");
 // const Food = require("./foodModel");
 
 const restaurantSchema = new mongoose.Schema({
@@ -15,20 +16,15 @@ const restaurantSchema = new mongoose.Schema({
     enum: ["cafe", "restaurant", "canteen", "takeout"],
     required: [true, "Please choose your type of establishment"],
   },
-  // "address": {
-  //   "type": "Point",
-  //   "coordinates": [-122.29286, 38.294065],
-  //   "address": "560 Jefferson St, Napa, CA 94559, USA"
-  // },
-  address: {
-    // GeoJSON
+  location: {
     type: {
       type: String,
-      default: "Point",
-      enum: ["Point"],
+      default: 'Point',
+      enum: ['Point']
     },
     coordinates: [Number],
     address: String,
+    description: String
   },
   email: {
     type: String,
@@ -68,13 +64,10 @@ const restaurantSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  profilePic: {
-    type: String,
-    default: "",
-  },
+  images: [String],
   active: {
     type: Boolean,
-    default: false,
+    default: true,
     // select: false,
   },
   passwordChangedAt: Date,
