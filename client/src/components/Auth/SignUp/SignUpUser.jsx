@@ -11,28 +11,27 @@ import {
   SlideFade,
   useToast,
   HStack,
-  ScaleFade,
-  RadioGroup,
-  Radio,
+  Select, // Import Select component
   Stack,
-  Divider,
 } from '@chakra-ui/react';
-
-import img from './OIG2.jpeg';
+import { useNavigate } from 'react-router-dom';
+import { useSignupMutation } from '../../../redux/features/slices/authUserApi';
+import img from '../../../assets/backgroundImages/OIG2.jpeg';
 import { Link } from 'react-router-dom';
+
 const SignUpUser = () => {
   const [userData, setUserData] = useState({
-    username: '',
+    name: '',
     email: '',
-    phoneNumber: '',
     password: '',
-    confirmPassword: '',
-    profileType: 'user',
+    passwordConfirm: '',
+    gender: '',
   });
-
+  const [signup, { isLoading, isError, error }] = useSignupMutation();
   const [showForm, setShowForm] = useState(true);
+  const [isUser, setIsUser] = useState(true); // Tracks if user button is clicked
   const toast = useToast();
-
+  const navigate = useNavigate();
   const handleChange = e => {
     setUserData({
       ...userData,
@@ -40,30 +39,19 @@ const SignUpUser = () => {
     });
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-
-    // Simulating form submission. Replace with your actual API call or logic.
-    setTimeout(() => {
-      toast({
-        title: 'Signup Successful',
-        description: 'Welcome to our platform!',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-
-      // Reset the form and show success message
-      setUserData({
-        username: '',
-        email: '',
-        phoneNumber: '',
-        password: '',
-        confirmPassword: '',
-        profileType: 'user',
-      });
-      setShowForm(false);
-    }, 1000);
+    console.log(userData);
+    if (userData.password !== userData.passwordConfirm) {
+      alert('Passwords do not match');
+    } else {
+      try {
+        await signup(userData).unwrap();
+        navigate('/');
+      } catch (err) {
+        console.log(err?.data?.message || err.error);
+      }
+    }
   };
 
   return (
@@ -100,34 +88,22 @@ const SignUpUser = () => {
             <form onSubmit={handleSubmit}>
               <FormControl mb={4}>
                 <HStack spacing={4} justifyContent="center">
-                  <Link to="/users/signup">
-                    <Button
-                      colorScheme={
-                        userData.profileType === 'user' ? 'purple' : 'white'
-                      }
-                      color={
-                        userData.profileType === 'user' ? 'white' : 'black'
-                      }
-                      size="sm"
-                      fontSize="sm"
-                    >
-                      User
-                    </Button>
-                  </Link>
+                  <Button
+                    colorScheme={isUser ? 'purple' : 'white'}
+                    color={isUser ? 'white' : 'black'}
+                    size="sm"
+                    fontSize="sm"
+                    onClick={() => setIsUser(true)}
+                  >
+                    User
+                  </Button>
                   <Link to="/restaurants/signup">
                     <Button
-                      colorScheme={
-                        userData.profileType === 'restaurant'
-                          ? 'purple'
-                          : 'white'
-                      }
-                      color={
-                        userData.profileType === 'restaurant'
-                          ? 'white'
-                          : 'black'
-                      }
+                      colorScheme={!isUser ? 'purple' : 'white'}
+                      color={!isUser ? 'white' : 'black'}
                       size="sm"
                       fontSize="sm"
+                      onClick={() => setIsUser(false)}
                     >
                       Restaurant
                     </Button>
@@ -139,8 +115,8 @@ const SignUpUser = () => {
                 <FormLabel>Username</FormLabel>
                 <Input
                   type="text"
-                  name="username"
-                  value={userData.username}
+                  name="name"
+                  value={userData.name}
                   onChange={handleChange}
                   required
                   borderColor={'darkblue'}
@@ -175,29 +151,27 @@ const SignUpUser = () => {
                 <FormLabel>Re-enter Password</FormLabel>
                 <Input
                   type="password"
-                  name="confirmPassword"
-                  value={userData.confirmPassword}
+                  name="passwordConfirm"
+                  value={userData.passwordConfirm}
                   onChange={handleChange}
                   required
                   borderColor={'darkblue'}
                 />
               </FormControl>
+
               <FormControl mb={1}>
                 <FormLabel>Gender</FormLabel>
-                <RadioGroup
+                <Select
                   name="gender"
                   value={userData.gender}
                   onChange={handleChange}
+                  borderColor={'darkblue'}
+                  required // Add required attribute to enforce selection
                 >
-                  <HStack spacing={4}>
-                    <Radio value="male" borderColor={'darkblue'}>
-                      male
-                    </Radio>
-                    <Radio value="female" borderColor={'darkblue'}>
-                      female
-                    </Radio>
-                  </HStack>
-                </RadioGroup>
+                  <option value="">SelectOption</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </Select>
               </FormControl>
               <Stack spacing="6" marginTop={5}>
                 <Button type="submit" colorScheme="purple" width="full">

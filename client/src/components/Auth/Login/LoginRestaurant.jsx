@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  useLoginMutation,
+  useForgotPasswordMutation,
+} from '../../../redux/features/slices/authRestaurantApi';
 import {
   Box,
   Button,
@@ -19,21 +23,31 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@chakra-ui/react';
-import { NavLink } from 'react-router-dom';
-
+import { NavLink, useNavigate } from 'react-router-dom';
+import { setCredentialsrestaurant } from '../../../redux/features/slices/authRestaurantSlice';
+import { useDispatch, useSelector } from 'react-redux';
 const LoginRestaurant = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [user, setUser] = useState(false);
   const [restaurant, setRestaurant] = useState(true);
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const [login, { isLoading, isError }] = useLoginMutation();
+  const [forgotPassword, { isLoadingpass, isErrorpass }] =
+    useForgotPasswordMutation();
+  const { restaurantInfo } = useSelector(state => state.authrestaurant);
+  useEffect(() => {
+    if (restaurantInfo) {
+      navigate('/');
+    }
+  }, [navigate, restaurantInfo]);
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
@@ -50,12 +64,16 @@ const LoginRestaurant = () => {
     const { value } = e.target;
     setForgotPasswordEmail(value);
   };
-
-  const handleLogin = () => {
-    // Implement your login logic here
-    console.log('Form data submitted:', formData);
+  const handleLogin = async e => {
+    e.preventDefault();
+    try {
+      const res = await login(formData).unwrap();
+      dispatch(setCredentialsrestaurant({ ...res }));
+      navigate('/');
+    } catch (err) {
+      console.error(err?.data?.message || err.error);
+    }
   };
-
   const handleForgotPassword = () => {
     // Implement your forgot password logic here
     onOpen();
@@ -75,12 +93,18 @@ const LoginRestaurant = () => {
     setRestaurant(true);
   };
 
-  const handleSubmitForgotPassword = () => {
-    // Simulate sending confirmation email
-    setConfirmationMessage(
-      'Confirmation email has been sent to ' + forgotPasswordEmail
-    );
-    onClose();
+  const handleSubmitForgotPassword = async e => {
+    e.preventDefault();
+    try {
+      console.log(forgotPasswordEmail);
+      await forgotPassword(forgotPasswordEmail).unwrap();
+      setConfirmationMessage(
+        'Confirmation email has been sent to ' + forgotPasswordEmail
+      );
+      onClose();
+    } catch (err) {
+      console.error('Forgot password failed:', err);
+    }
   };
 
   return (

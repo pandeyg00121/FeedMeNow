@@ -16,66 +16,42 @@ import {
   Divider,
 } from '@chakra-ui/react';
 import { AuthButtonGroup } from './AuthButtonGroup';
-import img from './OIG2.jpeg';
-import { NavLink } from 'react-router-dom';
+import img from '../../../assets/backgroundImages/OIG2.jpeg';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useSignupMutation } from '../../../redux/features/slices/authRestaurantApi';
+import { Link } from 'react-router-dom';
 const SignUpRestaurant = () => {
-  const [userData, setUserData] = useState({
-    username: '',
+  const [restaurantdata, setrestaurantdata] = useState({
+    name: '',
     email: '',
-
     password: '',
-    confirmPassword: '',
-    profileType: 'restaurant',
+    passwordConfirm: '',
   });
-
+  const [signup, { isLoading, isError, error }] = useSignupMutation();
+  const [isRestaurant, setIsRestaurant] = useState(true); // Track if signing up as a restaurant
   const [showForm, setShowForm] = useState(true);
   const toast = useToast();
-
+  const navigate = useNavigate();
   const handleChange = e => {
-    setUserData({
-      ...userData,
+    setrestaurantdata({
+      ...restaurantdata,
       [e.target.name]: e.target.value,
     });
   };
 
-  const switchToUser = () => {
-    setUserData({
-      ...userData,
-      profileType: 'user',
-    });
-  };
-
-  const switchToAdmin = () => {
-    setUserData({
-      ...userData,
-      profileType: 'restaurant',
-    });
-  };
-
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-
-    // Simulating form submission. Replace with your actual API call or logic.
-    setTimeout(() => {
-      toast({
-        title: 'Signup Successful',
-        description: 'Welcome to our platform!',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-
-      // Reset the form and show success message
-      setUserData({
-        username: '',
-        email: '',
-        phoneNumber: '',
-        password: '',
-        confirmPassword: '',
-        profileType: 'user',
-      });
-      setShowForm(false);
-    }, 1000);
+    console.log(restaurantdata);
+    if (restaurantdata.password !== restaurantdata.passwordConfirm) {
+      alert('Passwords do not match');
+    } else {
+      try {
+        await signup(restaurantdata).unwrap();
+        navigate('/');
+      } catch (err) {
+        console.log(err?.data?.message || err.error);
+      }
+    }
   };
 
   return (
@@ -112,47 +88,35 @@ const SignUpRestaurant = () => {
             <form onSubmit={handleSubmit}>
               <FormControl mb={2}>
                 <HStack spacing={4} justifyContent="center">
-                  <NavLink to="/users/signup">
+                  <Link to="/users/signup">
                     <Button
-                      colorScheme={
-                        userData.profileType === 'user' ? 'purple' : 'white'
-                      }
-                      color={
-                        userData.profileType === 'user' ? 'white' : 'black'
-                      }
+                      colorScheme={isRestaurant ? 'white' : 'purple'}
+                      color={isRestaurant ? 'black' : 'white'}
                       size="sm"
                       fontSize="sm"
+                      onClick={() => setIsRestaurant(false)}
                     >
                       User
                     </Button>
-                  </NavLink>
-                  <NavLink to="restaurants/signup">
-                    <Button
-                      colorScheme={
-                        userData.profileType === 'restaurant'
-                          ? 'purple'
-                          : 'white'
-                      }
-                      color={
-                        userData.profileType === 'restaurant'
-                          ? 'white'
-                          : 'black'
-                      }
-                      size="sm"
-                      fontSize="sm"
-                    >
-                      Restaurant
-                    </Button>
-                  </NavLink>
+                  </Link>
+                  <Button
+                    colorScheme={isRestaurant ? 'purple' : 'white'}
+                    color={isRestaurant ? 'white' : 'black'}
+                    size="sm"
+                    fontSize="sm"
+                    onClick={() => setIsRestaurant(true)}
+                  >
+                    Restaurant
+                  </Button>
                 </HStack>
               </FormControl>
 
               <FormControl mb={4}>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <Input
                   type="text"
-                  name="username"
-                  value={userData.username}
+                  name="name"
+                  value={restaurantdata.name}
                   onChange={handleChange}
                   required
                 />
@@ -163,7 +127,7 @@ const SignUpRestaurant = () => {
                 <Input
                   type="email"
                   name="email"
-                  value={userData.email}
+                  value={restaurantdata.email}
                   onChange={handleChange}
                   required
                 />
@@ -173,7 +137,7 @@ const SignUpRestaurant = () => {
                 <Input
                   type="password"
                   name="password"
-                  value={userData.password}
+                  value={restaurantdata.password}
                   onChange={handleChange}
                   required
                 />
@@ -182,8 +146,8 @@ const SignUpRestaurant = () => {
                 <FormLabel>Re-enter Password</FormLabel>
                 <Input
                   type="password"
-                  name="confirmPassword"
-                  value={userData.confirmPassword}
+                  name="passwordConfirm"
+                  value={restaurantdata.passwordConfirm}
                   onChange={handleChange}
                   required
                 />
@@ -192,11 +156,11 @@ const SignUpRestaurant = () => {
                 <Button type="submit" colorScheme="purple" width="full">
                   Sign Up
                 </Button>
-                {userData.profileType === 'restaurant' && (
+                {isRestaurant && (
                   <>
                     <HStack>
                       <Divider />
-                      <Text textStyle="sm" whiteSpace="nowrap" color="fg.muted">
+                      <Text textStyle="sm" whiteSpace="nowrap" color="gray.500">
                         or continue with
                       </Text>
                       <Divider />
@@ -213,6 +177,7 @@ const SignUpRestaurant = () => {
           <Box
             p={8}
             width="md"
+            bgColor="white"
             borderWidth={1}
             borderRadius="md"
             boxShadow="lg"
