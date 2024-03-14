@@ -59,7 +59,7 @@ const restaurantSchema = new mongoose.Schema({
     set: (val) => Math.round(val * 10) / 10,
     //val=4.666666 -> round(4.666666*10) -> round(46.6666) -> 47/10 -> 4.7
   },
-  //no of user rated
+  //no of ratings
   ratingsQuantity: {
     type: Number,
     default: 0,
@@ -75,7 +75,7 @@ const restaurantSchema = new mongoose.Schema({
   passwordResetExpires: Date,
   reviews: [
     {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Reviews",
     },
   ],

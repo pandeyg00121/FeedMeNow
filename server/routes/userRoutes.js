@@ -28,6 +28,8 @@ router.delete("/deleteMe", userController.deleteMe);
 router.post("/placeOrder", orderController.placeOrder);
 router.post("/prevOrders/review", reviewController.addReview);
 router.get("/myReviews", reviewController.myReviews);
+router.get("/prevOrders", orderController.prevOrders);
+router.get("/currOrders", orderController.currOrders);
 
 module.exports = router;
 

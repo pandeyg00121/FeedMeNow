@@ -1,62 +1,57 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const validator = require("validator");
 
-const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Reference to the User model
-    required: true,
-  },
-  restaurants: [
-    {
-      restaurant: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Restaurant', // Reference to the Restaurant model
-        required: true,
-      },
-      items: [
-        {
-          food: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Food', // Reference to the Food model
-            required: true,
-          },
-          quantity: {
-            type: Number,
-            required: true,
-          },
-          price: {
-            type: Number,
-            required: true,
-          },
-        },
-      ],
-      rpice:{
-        type:Number,
-        required:true,
-      },
-      status: {
-        type: String,
-        enum: ['Pending', 'Preparing', 'Dispatched','Delivered'],
-        default: 'Pending',
-      },
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to the User model
+      required: true,
     },
-  ],
-  payment:
-  {
-    type:String,
-    enum: [ 'Cash On Delivery', 'Online Payment'],
-        default: 'Online Payment',
-  },
-  createdAt:
-  {
-    type:Date,
-    defualt:Date.now,
-  }
- 
-  // Add any other necessary fields such as delivery address, payment information, etc.
-}, { timestamps: true });
+    restaurant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant", // Reference to the Restaurant model
+      required: true,
+    },
+    items: [
+      {
+        food: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Food", // Reference to the Food model
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+    ],
+    rpice: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["Pending", "Preparing", "Out For Delivery" , "Delivered"],
+      default: "Pending",
+    },
+    payment: {
+      type: String,
+      enum: ["Cash", "Online"],
+      default: "Online",
+    },
+    createdAt: {
+      type: Date,
+      defualt: Date.now,
+    },
 
-const Order = mongoose.model('Order', orderSchema);
+  },
+  { timestamps: true }
+);
+
+const Order = mongoose.model("Order", orderSchema);
 
 module.exports = Order;
