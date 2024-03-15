@@ -63,5 +63,9 @@ exports.resReviews= catchAsync(async(req,res,next)=>{
         reviews,
       },
     });
+});
 
+exports.getAllReviews = catchAsync(async(req,res,next) => {
+  const data = await Review.find({});
+  res.status(200).send(data);
 });

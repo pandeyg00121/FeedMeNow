@@ -42,16 +42,50 @@ exports.resizeRestaurantImages = catchAsync(async (req, res, next) => {
   // 2) Images
   req.body.images = [];
 
-  await Promise.all(
-    req.files.images.map(async (file, i) => {
-      const filename = `restaurant-${req.restaurant.id}-${Date.now()}-${i + 1}.jpeg`;
-      req.body.images.push(filename);
-    })
-  );
+  if (req.files && req.files.images) {
+    // Use Promise.all to wait for all async operations to complete
+    await Promise.all(
+      req.files.images.map(async (file, i) => {
+        const filename = `restaurant-${req.restaurant.id}-${Date.now()}-${i + 1}.jpeg`;
+        req.body.images.push(filename);
+      })
+    );
+  } else {
+    console.error('No images uploaded');
+  }
     // console.log(req.body.images);
   next();
 });
 
+exports.updateImages = catchAsync(async (req, res, next) => {
+  
+  const files = req.files;
+  if(!files)
+  return next();
+  console.log(files);
+  // console.log(req.body);
+  const filenames = files.map(file => file.filename);
+  //1) Create error if user POSTs password data
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        "This route is not for password update.Please use update password",
+        400
+      )
+    );
+  }
+
+  const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.restaurant.id, { $set: { images: filenames } },{
+    new: true,
+    runValidators: true,
+  });
+  res.status(200).json({
+    status: "success",
+    data: {
+      restaurant: updatedRestaurant,
+    },
+  });
+});
 
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -214,32 +248,13 @@ exports.manageItems = catchAsync(async (req, res, next) => {
     // Fetch menu items
     const menu = await Food.find({ restaurant: restaurantId });
 
-    // Create a dashboard object with restaurant details, active status, and menu
-    const restaurantDashboard = {
-      details: {
-        name: restaurant.name,
-        type: restaurant.type,
-        // address: restuarant.address,
-        email: restaurant.email,
-        // profilePic: restaurant.profilePic,
-      },
-      isActive,
-      menu,
-      //   menu: menu.map((foodItem) => ({
-      //     name: foodItem.name,
-      //     type: foodItem.type,
-      //     price: foodItem.price,
-      //     description: foodItem.description,
-      //     image: foodItem.image,
-      //     active: foodItem.active,
-      //   })),
-    };
-
-    return res.status(200).json(restaurantDashboard);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server Error" });
+    res.status(200).send(menu);
   }
+  catch (error) {
+      console.error(error);
+      return res.status(500).send({ message: "Server Error" });
+  }
+
 });
 
 
@@ -411,35 +426,6 @@ exports.addItem= catchAsync(async (req, res, next) => {
     return newobj;
   };
 
-  exports.updateImages = catchAsync(async (req, res, next) => {
-  
-    const files = req.files;
-    if(!files)
-    return next();
-    console.log(files);
-    // console.log(req.body);
-    const filenames = files.map(file => file.filename);
-    //1) Create error if user POSTs password data
-    if (req.body.password || req.body.passwordConfirm) {
-      return next(
-        new AppError(
-          "This route is not for password update.Please use update password",
-          400
-        )
-      );
-    }
-
-    const updatedRestaurant = await Restaurant.findByIdAndUpdate(req.restaurant.id, { $set: { images: filenames } },{
-      new: true,
-      runValidators: true,
-    });
-    res.status(200).json({
-      status: "success",
-      data: {
-        restaurant: updatedRestaurant,
-      },
-    });
-  });
 
 exports.getAllPendingRestaurants = catchAsync(async (req,res,next)=>{ 
   const allPendingRestaurants= await Restaurant.find({ active: false });
@@ -465,4 +451,13 @@ exports.approvePendingRestaurants = catchAsync(async (req,res,next)=>{
           data : restaurant
       }
   });
+});
+
+exports.resMap = catchAsync(async (req, res, next) => {
+  const restaurants = await Restaurant.find({}, 'name location.coordinates');
+  const data = restaurants.map(restaurant => ({
+    name: restaurant.name,
+    coordinates: restaurant.location.coordinates
+  }));
+  res.status(200).send(data);
 });

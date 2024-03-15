@@ -28,6 +28,7 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+      },
     ],
     rpice: {
       type: Number,

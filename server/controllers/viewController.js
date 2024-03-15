@@ -8,7 +8,7 @@ const AppError = require("./../utils/appError");
 exports.aliasTopRestaurants=(req,res,next)=>{ 
   req.query.limit='5';
   req.query.sort='-ratingsAverage';
-  req.query.fields='name,ratingsAverage,ratingsQuantity';
+  req.query.fields='name,ratingsAverage,ratingsQuantity,slug,images';
   next();
 }
 
@@ -25,16 +25,7 @@ exports.getOverview = catchAsync(async (req, res) => {
         .paginate();
 
     const doc = await features.query;
-    
-    // SEND RESPONSE
-    res.status(200).json({
-        status:'success',
-        result: doc.length,
-        data:{
-            title: " Restaurants",
-            data : doc
-        }
-    });
+    res.status(200).send(doc);
 });
 
 exports.getRestaurant = catchAsync(async (req, res) => {
@@ -59,7 +50,7 @@ exports.getRestaurant = catchAsync(async (req, res) => {
 exports.aliasTopFoods=(req,res,next)=>{ 
   req.query.limit='6';
   req.query.sort='price';
-  req.query.fields='name,type,category,price,image';
+  req.query.fields='name,type,category,price,slug';
   next();
 }
 // change this overview only 6 top cheapest food
