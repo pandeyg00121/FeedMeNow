@@ -116,13 +116,13 @@ const createSendToken = (restaurant, statusCode, res) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
 
-  const restaurantEmail=req.body.email;
-  const apiUrl = `https://api-bdc.net/data/email-verify?emailAddress=${restaurantEmail}&key=${process.env.BIG_DATA_API_KEY}`;
-  const response = await axios.get(apiUrl);
-  // console.log(response.data);
+  // const restaurantEmail=req.body.email;
+  // const apiUrl = `https://api-bdc.net/data/email-verify?emailAddress=${restaurantEmail}&key=${process.env.BIG_DATA_API_KEY}`;
+  // const response = await axios.get(apiUrl);
+  // // console.log(response.data);
 
-  if(!response.data.isValid)
-  return next(new AppError("Please Provide valid Email", 400));
+  // if(!response.data.isValid)
+  // return next(new AppError("Please Provide valid Email", 400));
 
   const newRestaurant = await Restaurant.create({
     name: req.body.name,
@@ -146,6 +146,9 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //finding the restaurant using email and also saving password
   const restaurant = await Restaurant.findOne({ email }).select("+password");
+
+  if(!restaurant)
+  res.status(404).send('No Account with this mail id');
 
   const correct = await restaurant.correctPassword(password, restaurant.password);
 
@@ -409,13 +412,7 @@ exports.addItem= catchAsync(async (req, res, next) => {
         restaurant: req.restaurant.id,
       
       });
-    
-      res.status(201).json({
-        status: "success",
-        data: {
-          foodItem: newFoodItem,
-        },
-      });
+      res.status(201).send(newFoodItem);
   });
 
   const filterObj = (obj, ...allowedFields) => {

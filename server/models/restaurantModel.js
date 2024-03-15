@@ -67,7 +67,7 @@ const restaurantSchema = new mongoose.Schema({
   images: [String],
   active: {
     type: Boolean,
-    default: true,
+    default: false,
     // select: false,
   },
   passwordChangedAt: Date,

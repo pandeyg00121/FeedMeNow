@@ -21,12 +21,10 @@ router.get('/dashboard',restaurantController.dashboard);
 router.get('/manageItems',restaurantController.manageItems);
 router.post("/addItem", restaurantController.addItem);
 
-router.patch('/manageOrders/current/:id',);
-
 //Order routes
 router.get("/manageOrders/previous" , orderController.resPrevOrders);
 router.get("/manageOrders/current" , orderController.resCurrOrders );
-router.patch("/manageOrders/updateOrderStatus", orderController.updateOrderStatus);
+router.patch("/manageOrders/updateOrderStatus/", orderController.updateOrderStatus);
 
 router.patch("/updateMyPassword",restaurantController.updatePassword);
 router.get("/me", restaurantController.getMe,restaurantController.getRestaurant);

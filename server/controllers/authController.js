@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const axios = require('axios');
-
+const sendMail = require('./../utils/sendMail');
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
@@ -42,12 +42,12 @@ exports.signup = catchAsync(async (req, res, next) => {
   const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
   const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
 
-  const apiUrl = `https://api-bdc.net/data/email-verify?emailAddress=${userEmail}&key=${process.env.BIG_DATA_API_KEY}`;
-  const response = await axios.get(apiUrl);
-  console.log(response.data);
+  // const apiUrl = `https://api-bdc.net/data/email-verify?emailAddress=${userEmail}&key=${process.env.BIG_DATA_API_KEY}`;
+  // const response = await axios.get(apiUrl);
+  // console.log(response.data);
 
-  if(!response.data.isValid)
-  return next(new AppError("Please Provide valid Email", 400));
+  // if(!response.data.isValid)
+  // return next(new AppError("Please Provide valid Email", 400));
 
   const newUser = await User.create({
     name: req.body.name,
