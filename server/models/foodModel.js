@@ -30,7 +30,6 @@ const foodSchema = new mongoose.Schema({
     required: [true, "A Food must have a description"],
     default:"good food",
     minLength: 8,
-    select: false,
   },
   image: {
     type: String,
@@ -39,7 +38,6 @@ const foodSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true,
-    select: false,
   },
   restaurant:
   {

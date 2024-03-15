@@ -24,7 +24,7 @@ router.post("/addItem", restaurantController.addItem);
 //Order routes
 router.get("/manageOrders/previous" , orderController.resPrevOrders);
 router.get("/manageOrders/current" , orderController.resCurrOrders );
-router.patch("/manageOrders/updateOrderStatus", orderController.updateOrderStatus);
+router.patch("/manageOrders/updateOrderStatus/", orderController.updateOrderStatus);
 
 router.patch("/updateMyPassword",restaurantController.updatePassword);
 router.get("/me", restaurantController.getMe,restaurantController.getRestaurant);

@@ -8,7 +8,7 @@ const AppError = require("./../utils/appError");
 exports.aliasTopRestaurants=(req,res,next)=>{ 
   req.query.limit='5';
   req.query.sort='-ratingsAverage';
-  req.query.fields='name,ratingsAverage,ratingsQuantity';
+  req.query.fields='name,ratingsAverage,ratingsQuantity,slug,images';
   next();
 }
 
@@ -25,41 +25,38 @@ exports.getOverview = catchAsync(async (req, res) => {
         .paginate();
 
     const doc = await features.query;
-    
-    // SEND RESPONSE
-    res.status(200).json({
-        status:'success',
-        result: doc.length,
-        data:{
-            title: " Restaurants",
-            data : doc
-        }
-    });
+    res.status(200).send(doc);
 });
 
 exports.getRestaurant = catchAsync(async (req, res) => {
   //1) Get the data for req tour
-  const restaurant = await Restaurant.findOne({
+  const restaurantObject = await Restaurant.findOne({
     slug: req.params.slug,
   });
 //   .populate({
 //     path: "reviews",
 //     fields: "review rating user",
 //   });
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      title: `${restaurant.name}`,
-      restaurant,
-    },
-  });
+const restId=restaurantObject._id;
+const foods = await Food.find({restaurant:restId}).select("-restaurant");
+const restaurantInfo = {
+  name: restaurantObject.name,
+  address: restaurantObject.location.address,
+  rating: restaurantObject.ratingsAverage,
+  images: restaurantObject.images,
+  foods,
+  location: {
+      lat: restaurantObject.location.coordinates[1],
+      lng: restaurantObject.location.coordinates[0]
+  }
+};
+  res.status(200).send(restaurantInfo);
 });
 
 exports.aliasTopFoods=(req,res,next)=>{ 
   req.query.limit='6';
   req.query.sort='price';
-  req.query.fields='name,type,category,price,image';
+  req.query.fields='name,type,category,price,slug,description,image';
   next();
 }
 // change this overview only 6 top cheapest food
@@ -75,16 +72,9 @@ exports.getAllFoods = catchAsync(async (req, res) => {
       .paginate();
 
   const doc = await features.query;
-  
+  // const doc = await Food.find();
   // SEND RESPONSE
-  res.status(200).json({
-      status:'success',
-      result: doc.length,
-      data:{
-          title: "Food",
-          data : doc
-      }
-  });
+  res.status(200).send(doc);
   });
   
   exports.getFood = catchAsync(async (req, res) => {
@@ -93,12 +83,6 @@ exports.getAllFoods = catchAsync(async (req, res) => {
       slug: req.params.slug,
     });
   
-    res.status(200).json({
-      status: "success",
-      data: {
-        title: `${food.name}`,
-        food,
-      },
-    });
+    res.status(200).json(food);
   });
   

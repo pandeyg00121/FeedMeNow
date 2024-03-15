@@ -3,6 +3,7 @@ const express = require('express');
 const authController = require("./../controllers/authController");
 const userController = require("./../controllers/userController");
 const restaurantController = require("./../controllers/restaurantController");
+const reviewController = require("./../controllers/reviewController");
 
 const router = express.Router();
 router.use(express.json());
@@ -19,7 +20,7 @@ router.get("/allUser",userController.getAllUsers)
 router.get("/allUser/:id",userController.getUser)
 // router.patch(userController.updateUser)
 router.delete("/allUser/:id",userController.deleteUser);
-
+router.get('/userMap',userController.userMap);
 
 router.get("/pendingReq",restaurantController.getAllPendingRestaurants)
 router.patch("/pendingReq/:id",restaurantController.approvePendingRestaurants)
@@ -29,6 +30,7 @@ router.get("/allRes",restaurantController.getAllRestaurants)
 router.get("/allRes/:id",restaurantController.getRestaurant)
 // router.patch(userController.updateUser)
 router.delete("/allRes/:id",restaurantController.deleteRestaurant);
+router.get('/resMap',restaurantController.resMap);
 
-router.get("/allReviews",)
+router.get("/allReviews",reviewController.getAllReviews);
 module.exports = router;
