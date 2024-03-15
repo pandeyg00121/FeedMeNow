@@ -21,8 +21,6 @@ router.get('/dashboard',restaurantController.dashboard);
 router.get('/manageItems',restaurantController.manageItems);
 router.post("/addItem", restaurantController.addItem);
 
-router.patch('/manageOrders/current/:id',);
-
 //Order routes
 router.get("/manageOrders/previous" , orderController.resPrevOrders);
 router.get("/manageOrders/current" , orderController.resCurrOrders );
