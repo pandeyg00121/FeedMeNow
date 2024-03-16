@@ -3,19 +3,20 @@ import React, { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import App from './App';
 import { ChakraProvider } from '@chakra-ui/react';
-import {ApiProvider} from "@reduxjs/toolkit/query/react"
+import { Provider } from 'react-redux';
 import { myApi } from './redux/api';
+import {store} from './store.js'
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 
 root.render(
   <StrictMode>
-     <ApiProvider api={myApi}>
+     <Provider store={store}>
     <ChakraProvider theme={theme}>
     <ColorModeScript />
     <App />
     </ChakraProvider>
-    </ApiProvider>
+    </Provider>
   </StrictMode>
 );
 

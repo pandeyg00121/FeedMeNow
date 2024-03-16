@@ -1,21 +1,6 @@
 import { Box, Image, Flex, Text,Icon} from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
 
-function StarRating({ rating }) {
-    const stars = [];
-  
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <Icon
-          key={i}
-          as={FaStar}
-          color={i < Math.floor(rating) ? "yellow.400" : "gray.300"}
-        />
-      );
-    }
-  
-    return <Box mt={1}>{stars}</Box>;
-  }
 
 function ProductCard({ product }) {
   
@@ -41,12 +26,7 @@ function ProductCard({ product }) {
         <Flex alignItems="center" mt="1.5">
           <Text fontSize="md" fontWeight={"bold"} color={"black"}>{product.restaurant}</Text>
         </Flex>
-        <Flex direction={"row"} gap={2}>
-        <StarRating rating={product.rating}/>
-        <Text color="black" fontWeight="bold" mt={1}>
-            ({product.rating})
-        </Text>
-        </Flex>
+        
       </Box>
     </Box>
   );
