@@ -143,3 +143,12 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.userMap = catchAsync(async (req, res, next) => {
+  const users = await User.find({}, 'name location.coordinates');
+  const data = users.map(user => ({
+    name: user.name,
+    coordinates: user.location.coordinates
+  }));
+  res.status(200).send(data);
+});

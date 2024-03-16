@@ -2,6 +2,9 @@ const Order = require("./../models/orderModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const Cart = require("./../models/cartModel");
+const User = require("./../models/userModel");
+const Food = require("../models/foodModel");
+const Restaurant = require("../models/restaurantModel");
 
 // Place an order
 exports.placeOrder = catchAsync(async (req, res, next) => {
@@ -51,13 +54,49 @@ exports.prevOrders=catchAsync(async(req,res,next)=>{
   const userId = req.user.id;
 
   const orders = await Order.find({ user: userId, status: 'Delivered' });
+  const modifiedOrders = [];
+ // Iterate through each order
+ for (const order of orders) {
+  // Fetch user details for the order
+  const restaurant = await Restaurant.findById(order.restaurant);
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      orders,
-    },
-  });
+   // Modified items array to store food details
+const modifiedItems = await Promise.all(order.items.map(async (item) => {
+  // Fetch food details for the item
+  const food = await Food.findById(item.food);
+  
+  // Return modified item details
+  return {
+    foodName: food.name,
+    quantity: item.quantity,
+    price: item.price
+  };
+}));
+
+
+ // Modified order object
+ const modifiedOrder = {
+  _id: order._id,
+  restaurantName: restaurant.name,
+  items: modifiedItems,
+  // status: order.status,
+  rPrice: order.rpice,
+  createdAt: order.createdAt,
+  paymentMode: order.payment
+};
+
+
+  // Add modified order to the array
+  modifiedOrders.push(modifiedOrder);
+}
+
+// Send the modified orders to the restaurant
+res.status(200).json({
+  status: 'success',
+  data: {
+    orders: modifiedOrders,
+  },
+});
 
 });
 
@@ -66,42 +105,156 @@ exports.currOrders=catchAsync(async(req,res,next)=>{
   const userId = req.user.id;
 
   const orders = await Order.find({ user: userId, status: { $ne: 'Delivered' } });
+  const modifiedOrders = [];
+   // Iterate through each order
+ for (const order of orders) {
+  // Fetch user details for the order
+  const restaurant = await Restaurant.findById(order.restaurant);
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      orders,
-    },
-  });
+   // Modified items array to store food details
+const modifiedItems = await Promise.all(order.items.map(async (item) => {
+  // Fetch food details for the item
+  const food = await Food.findById(item.food);
+  
+  // Return modified item details
+  return {
+    foodName: food.name,
+    quantity: item.quantity,
+    price: item.price
+  };
+}));
 
+
+ // Modified order object
+ const modifiedOrder = {
+  _id: order._id,
+  restaurantName: restaurant.name,
+  items: modifiedItems,
+  status: order.status,
+  rPrice: order.rpice,
+  createdAt: order.createdAt,
+  paymentMode: order.payment
+};
+
+
+  // Add modified order to the array
+  modifiedOrders.push(modifiedOrder);
+}
+
+// Send the modified orders to the restaurant
+res.status(200).json({
+  status: 'success',
+  data: {
+    orders: modifiedOrders,
+  },
+});
 });
 
 //Restaurant can view all previous orders
 exports.resPrevOrders=catchAsync(async(req,res,next)=>{
   const restaurantId = req.restaurant.id; 
 
-  const orders = await Order.find({ restaurant: restaurantId, status: 'Delivered' });
+  const orders = await Order.find({ restaurant: restaurantId, status: 'Delivered'  });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      orders,
-    },
-  });
+  const modifiedOrders = [];
+
+    // Iterate through each order
+    for (const order of orders) {
+      // Fetch user details for the order
+      const user = await User.findById(order.user);
+
+       // Modified items array to store food details
+    const modifiedItems = await Promise.all(order.items.map(async (item) => {
+      // Fetch food details for the item
+      const food = await Food.findById(item.food);
+      
+      // Return modified item details
+      return {
+        foodName: food.name,
+        quantity: item.quantity,
+        price: item.price
+      };
+    }));
+
+    
+     // Modified order object
+     const modifiedOrder = {
+      _id: order._id,
+      userName: user.name,
+      items: modifiedItems,
+      // status: order.status,
+      rPrice: order.rpice,
+      createdAt: order.createdAt,
+      paymentMode: order.payment
+    };
+
+
+      // Add modified order to the array
+      modifiedOrders.push(modifiedOrder);
+    }
+
+    // Send the modified orders to the restaurant
+    res.status(200).json({
+      status: 'success',
+      data: {
+        orders: modifiedOrders,
+      },
+    });
+
 });
 
 //Restaurant can view current pending orders
 exports.resCurrOrders=catchAsync(async(req,res,next)=>{
+  
   const restaurantId = req.restaurant.id; 
 
   const orders = await Order.find({ restaurant: restaurantId, status: { $ne: 'Delivered' } });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      orders,
-    },
-  });
+  const modifiedOrders = [];
+
+    // Iterate through each order
+    for (const order of orders) {
+      // Fetch user details for the order
+      const user = await User.findById(order.user);
+
+       // Modified items array to store food details
+    const modifiedItems = await Promise.all(order.items.map(async (item) => {
+      // Fetch food details for the item
+      const food = await Food.findById(item.food);
+      
+      // Return modified item details
+      return {
+        foodName: food.name,
+        quantity: item.quantity,
+        price: item.price
+      };
+    }));
+
+    
+     // Modified order object
+     const modifiedOrder = {
+      _id: order._id,
+      userName: user.name,
+      items: modifiedItems,
+      status: order.status,
+      rPrice: order.rpice,
+      createdAt: order.createdAt,
+      paymentMode: order.payment
+    };
+
+
+      // Add modified order to the array
+      modifiedOrders.push(modifiedOrder);
+    }
+
+    // Send the modified orders to the restaurant
+    res.status(200).json({
+      status: 'success',
+      data: {
+        orders: modifiedOrders,
+      },
+    });
+
 });
 
 //Restaurant can change order status

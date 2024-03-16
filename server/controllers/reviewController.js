@@ -22,6 +22,9 @@ exports.addReview = catchAsync(async (req, res, next) => {
     order: orderId,
   });
 
+  
+
+
   res.status(201).json({
     status: 'success',
     data: {
@@ -63,5 +66,9 @@ exports.resReviews= catchAsync(async(req,res,next)=>{
         reviews,
       },
     });
+});
 
+exports.getAllReviews = catchAsync(async(req,res,next) => {
+  const data = await Review.find({});
+  res.status(200).send(data);
 });
