@@ -5,8 +5,9 @@ import App from './App';
 import { Provider } from 'react-redux';
 import store from './store';
 import { ChakraProvider } from '@chakra-ui/react';
-import { ApiProvider } from '@reduxjs/toolkit/query/react';
+import { Provider } from 'react-redux';
 import { myApi } from './redux/api';
+import {store} from './store.js'
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 

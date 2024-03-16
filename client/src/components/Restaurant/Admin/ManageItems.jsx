@@ -1,78 +1,29 @@
 import { Box, Grid,Heading,TableContainer,Table,TableCaption,Thead,Tr,Th,Tbody,Td,Image,HStack,Button,useDisclosure} from '@chakra-ui/react'
 import {RiDeleteBin7Fill,RiAddCircleFill} from "react-icons/ri"
 import {Link} from "react-router-dom";
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
 import cursor from "../../../assets/cursor red.png"
 import Sidebar from './Sidebar'
 import Footer from '../../Layout/Footer'
+import { useGetAllMenuItemsQuery } from '../../../redux/api';
 
 
 const ManageItems = () => {
     
     const { isOpen, onClose, onOpen } = useDisclosure();
+    
+    const {isLoading,data:itemData}=useGetAllMenuItemsQuery("")
+    console.log(isLoading,itemData);
 
-    const data=[{
-        _id:1,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"non-veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:4.5,
-      },{
-        _id:2,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:3,
-      },
-      {
-        _id:3,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:2,
-      },
-      {
-        _id:4,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:1.5,
-      },
-      {
-        _id:5,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:3,
-      },
-      {
-        _id:6,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:5,
-      }]
+      const [items,setItems]=useState([]);
 
-      const [items,setItems]=useState(data);
-
+      useEffect(() => {
+        if (!isLoading && itemData) {
+            setItems(itemData);
+        }
+    }, [isLoading, itemData]);
+      
+      
       const deleteItem = (id) => {
         const updatedItems = items.filter((item) => item._id !== id);
         setItems(updatedItems);

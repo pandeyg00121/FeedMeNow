@@ -14,8 +14,8 @@ export const myApi=createApi({
       getCurrentOrders:builder.query({query:()=>"/restaurants/manageOrders/current"}),
       getAllReviews:builder.query({query:()=>"/restaurants/myReviews"}),
       //search routes
-      getSearchRes:builder.query({query:()=>"/restaurants"}),
-      getSearchFoods:builder.query({query:()=>"/foods"}),
+      getSearchRes:builder.query({query:()=>"/restaurantsAll"}),
+      getSearchFoods:builder.query({query:()=>"/foodsAll"}),
       //admin routes
       getAllUsers:builder.query({query:()=>"/admin/allUsers"}),
       getAllRestaurants:builder.query({query:()=>"/admin/allRes"}),
@@ -61,5 +61,5 @@ export const myApi=createApi({
      })
 })
 
-export const {useGetHomeFoodsQuery,useGetHomeRestaurantsQuery,useNewFoodItemMutation,useGetSearchFoodsQuery}=myApi;
+export const {useNewFoodItemMutation,useGetSearchFoodsQuery,useGetSearchResQuery,useGetHomeRestaurantsQuery,useGetHomeFoodsQuery,useGetAllMenuItemsQuery}=myApi;
 
