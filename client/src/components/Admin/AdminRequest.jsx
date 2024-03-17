@@ -16,6 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 import Sidebar from './Sidebar';
+import { useAcceptPendingReqMutation, useGetPendingReqAdminQuery } from '../../redux/api';
 
 // Simulated restaurant request data
 const restaurantRequestsData = [
@@ -40,35 +41,19 @@ const restaurantRequestsData = [
 
 const AdminRestaurantRequestPage = () => {
   const [restaurantRequests, setRestaurantRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {data,isLoading}=useGetPendingReqAdminQuery("");
+  
   const toast = useToast();
 
   useEffect(() => {
-    // Simulate fetching restaurant requests data from an API or database
-    // In a real-world scenario, you would fetch this data from your server
-    // For demonstration purposes, using a timeout to simulate an asynchronous operation
-    const fetchData = async () => {
-      try {
-        // Simulating an asynchronous data fetch
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setRestaurantRequests(restaurantRequestsData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching restaurant request data:', error);
-        setLoading(false);
-      }
-    };
+   if(!isLoading && data){
+    setRestaurantRequests(data);
+   }
+  }, [isLoading,data]);
 
-    fetchData();
-  }, []);
-
-  const handleDeleteRequest = requestId => {
-    // In a real-world scenario, you would send a request to your backend to delete the restaurant request
-    // For demonstration purposes, simply updating the state here
-    setRestaurantRequests(prevRequests =>
-      prevRequests.filter(request => request.id !== requestId)
-    );
-
+  const handleDeleteRequest = (requestId) => {
+   const updatedRequests=restaurantRequests.filter((request)=>request._id!==requestId);
+    setRestaurantRequests(updatedRequests);
     toast({
       title: 'Request Deleted',
       description: `Request with ID ${requestId} has been deleted.`,
@@ -78,41 +63,8 @@ const AdminRestaurantRequestPage = () => {
     });
   };
 
-  const handleAcceptRequest = requestId => {
-    // In a real-world scenario, you would send a request to your backend to accept the restaurant request
-    // For demonstration purposes, simply updating the state here
-    setRestaurantRequests(prevRequests =>
-      prevRequests.map(request =>
-        request.id === requestId ? { ...request, status: 'accepted' } : request
-      )
-    );
+  
 
-    toast({
-      title: 'Request Accepted',
-      description: `Request with ID ${requestId} has been accepted.`,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
-  const handleDenyRequest = requestId => {
-    // In a real-world scenario, you would send a request to your backend to deny the restaurant request
-    // For demonstration purposes, simply updating the state here
-    setRestaurantRequests(prevRequests =>
-      prevRequests.map(request =>
-        request.id === requestId ? { ...request, status: 'rejected' } : request
-      )
-    );
-
-    toast({
-      title: 'Request Denied',
-      description: `Request with ID ${requestId} has been denied.`,
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-    });
-  };
 
   return (
     <Grid templateColumns="1fr auto" gap="4" height="100vh">
@@ -128,7 +80,7 @@ const AdminRestaurantRequestPage = () => {
           Admin Restaurant Request Page
         </Heading>
 
-        {loading ? (
+        {isLoading ? (
           <Spinner size="lg" color="teal.500" />
         ) : (
           <Table variant="simple" mt="4" fontSize="lg" width="100%">
@@ -139,50 +91,12 @@ const AdminRestaurantRequestPage = () => {
                 <Th>Location</Th>
                 <Th>Email</Th>
                 <Th>Action</Th>
-                <Th>Status</Th> {/* New Status column */}
+                <Th>Status</Th> 
               </Tr>
             </Thead>
             <Tbody>
               {restaurantRequests.map(request => (
-                <Tr key={request.id}>
-                  <Td>{request.id}</Td>
-                  <Td>{request.name}</Td>
-                  <Td>{request.location}</Td>
-                  <Td>{request.email}</Td>
-                  <Td>
-                    {request.status === 'pending' && (
-                      <>
-                        <IconButton
-                          icon={<FaCheck />}
-                          colorScheme="green"
-                          onClick={() => handleAcceptRequest(request.id)}
-                        />
-                        <IconButton
-                          ml={2}
-                          icon={<FaTimes />}
-                          colorScheme="red"
-                          onClick={() => handleDenyRequest(request.id)}
-                        />
-                      </>
-                    )}
-                  </Td>
-                  <Td>
-                    {request.status === 'pending' && 'Pending'}
-                    {request.status === 'accepted' && (
-                      <Badge colorScheme="green">Accepted</Badge>
-                    )}
-                    {request.status === 'rejected' && (
-                      <Badge colorScheme="red">Rejected</Badge>
-                    )}
-                  </Td>
-                  <Td>
-                    <IconButton
-                      icon={<FaTrash />}
-                      colorScheme="red"
-                      onClick={() => handleDeleteRequest(request.id)}
-                    />
-                  </Td>
-                </Tr>
+                <Row request={request} handleDeleteRequest={handleDeleteRequest} toast={toast}/>
               ))}
             </Tbody>
           </Table>
@@ -192,5 +106,58 @@ const AdminRestaurantRequestPage = () => {
     </Grid>
   );
 };
+
+function Row({request,handleDeleteRequest,toast}){
+  const [acceptReq]=useAcceptPendingReqMutation();
+
+  const handleAcceptRequest = async(requestId) => {
+    try {
+      await acceptReq(requestId)
+    } catch (error) {
+      console.log(error);
+    }
+
+    toast({
+      title: 'Request Accepted',
+      description: `Request with ID ${requestId} has been accepted.`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  return(
+    <Tr>
+                  <Td>{request._id}</Td>
+                  <Td>{request.name}</Td>
+                  <Td>{request.location.address}</Td>
+                  <Td>{request.email}</Td>
+                  <Td>
+                    {request.active === false && (
+                      
+                        <IconButton
+                          icon={<FaCheck />}
+                          colorScheme="green"
+                          onClick={() => handleAcceptRequest(request._id)}
+                        />
+                        
+                    )}
+                  </Td>
+                  <Td>
+                    {request.active === false && 'Pending'}
+                    {request.status === true && (
+                      <Badge colorScheme="green">Accepted</Badge>
+                    )}
+                  </Td>
+                  <Td>
+                    <IconButton
+                      icon={<FaTrash />}
+                      colorScheme="red"
+                      onClick={() => handleDeleteRequest(request._id)}
+                    />
+                  </Td>
+                </Tr>
+  )
+}
 
 export default AdminRestaurantRequestPage;

@@ -9,7 +9,8 @@ const Sidebar = () => {
     <VStack spacing={"8"} p={"16"} boxShadow={'-1px 0 10px rgba(255,0,0,0.5)'}>
       <LinkButton Icon={RiDashboardFill} text={"Dashboard"} url="dashboard" active={location.pathname==="/restaurant/dashboard"}/>
       <LinkButton Icon={RiEyeFill} text={"Manage Items"} url="manageitems" active={(location.pathname==="/restaurant/manageitems")||location.pathname==="/restaurant/additem"}/>
-      <LinkButton Icon={RiAddCircleFill} text={"Manage Orders"} url="manageorders" active={location.pathname==="/restaurant/manageorders"}/>
+      <LinkButton Icon={RiAddCircleFill} text={"Manage Current Orders"} url="currentorders" active={location.pathname==="/restaurant/currentorders"}/>
+      <LinkButton Icon={RiAddCircleFill} text={"View Previous Orders"} url="previousorders" active={location.pathname==="/restaurant/previousorders"}/>
       </VStack>
   )
 }

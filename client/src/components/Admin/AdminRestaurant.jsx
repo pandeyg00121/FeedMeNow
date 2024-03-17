@@ -18,6 +18,8 @@ import {
 } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
 import Sidebar from './Sidebar';
+import { useGetAllRestaurantsQuery,useDeleteResMutation } from '../../redux/api';
+
 
 // Simulated restaurant data
 const restaurantsData = [
@@ -44,35 +46,25 @@ const restaurantsData = [
 
 const AdminRestaurantPage = () => {
   const [restaurants, setRestaurants] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {data,isLoading}=useGetAllRestaurantsQuery("");
+  const [deleteRes]=useDeleteResMutation();
   const toast = useToast();
 
   useEffect(() => {
-    // Simulate fetching restaurant data from an API or database
-    // In a real-world scenario, you would fetch this data from your server
-    // For demonstration purposes, using a timeout to simulate an asynchronous operation
-    const fetchData = async () => {
-      try {
-        // Simulating an asynchronous data fetch
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setRestaurants(restaurantsData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching restaurant data:', error);
-        setLoading(false);
-      }
-    };
+    if(!isLoading && data){
+      setRestaurants(data);
+    }
+  }, [isLoading,data]);
 
-    fetchData();
-  }, []);
-
-  const handleDeleteRestaurant = restaurantId => {
-    // In a real-world scenario, you would send a request to your backend to delete the restaurant
-    // For demonstration purposes, simply updating the state here
-    setRestaurants(prevRestaurants =>
-      prevRestaurants.filter(restaurant => restaurant.id !== restaurantId)
-    );
-
+  const handleDeleteRestaurant = async (restaurantId)=> {
+    try {
+      deleteRes(restaurantId);
+      const updatedRestaurants=restaurants.filter((restaurant)=>restaurant._id!==restaurantId)
+      setRestaurants(updatedRestaurants);
+    } catch (error) {
+      console.log(error)
+    }
+  
     toast({
       title: 'Restaurant Deleted',
       description: `Restaurant with ID ${restaurantId} has been deleted.`,
@@ -82,25 +74,6 @@ const AdminRestaurantPage = () => {
     });
   };
 
-  const handleStatusChange = restaurantId => {
-    // In a real-world scenario, you would send a request to your backend to update the restaurant's status
-    // For demonstration purposes, simply updating the state here
-    setRestaurants(prevRestaurants =>
-      prevRestaurants.map(restaurant =>
-        restaurant.id === restaurantId
-          ? { ...restaurant, isActive: !restaurant.isActive }
-          : restaurant
-      )
-    );
-
-    toast({
-      title: 'Status Updated',
-      description: `Status for Restaurant with ID ${restaurantId} has been updated.`,
-      status: 'info',
-      duration: 3000,
-      isClosable: true,
-    });
-  };
 
   return (
     <Grid templateColumns="1fr auto" gap="4" height="100vh">
@@ -116,7 +89,7 @@ const AdminRestaurantPage = () => {
           Admin Restaurant Page
         </Heading>
 
-        {loading ? (
+        {isLoading ? (
           <Spinner size="lg" color="teal.500" />
         ) : (
           <Table variant="simple" mt="4" fontSize="lg" width="100%">
@@ -133,35 +106,7 @@ const AdminRestaurantPage = () => {
             </Thead>
             <Tbody>
               {restaurants.map(restaurant => (
-                <Tr key={restaurant.id}>
-                  <Td>{restaurant.id}</Td>
-                  <Td>
-                    <Avatar
-                      size="md"
-                      name={restaurant.name}
-                      src={restaurant.logo}
-                    />
-                  </Td>
-                  <Td>{restaurant.name}</Td>
-                  <Td>{restaurant.location}</Td>
-                  <Td>{restaurant.email}</Td>
-                  <Td>{restaurant.rating}</Td>
-                  <Td>
-                    <Badge
-                      colorScheme={restaurant.isActive ? 'green' : 'red'}
-                      variant="solid"
-                    >
-                      {restaurant.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </Td>
-                  <Td>
-                    <IconButton
-                      icon={<FaTrash />}
-                      colorScheme="red"
-                      onClick={() => handleDeleteRestaurant(restaurant.id)}
-                    />
-                  </Td>
-                </Tr>
+                <Row restaurant={restaurant} handleDeleteRestaurant={handleDeleteRestaurant}/>
               ))}
             </Tbody>
           </Table>
@@ -171,5 +116,41 @@ const AdminRestaurantPage = () => {
     </Grid>
   );
 };
+
+function Row({restaurant,handleDeleteRestaurant}){
+  
+  return(
+    <Tr>
+                  <Td>{restaurant._id}</Td>
+                  <Td>
+                    <Avatar
+                      size="md"
+                      name={restaurant.name}
+                      src={restaurant.images[0]}
+                    />
+                  </Td>
+                  <Td>{restaurant.name}</Td>
+                  <Td>{restaurant.location.address}</Td>
+                  <Td>{restaurant.email}</Td>
+                  <Td>{restaurant.ratingsAverage}</Td>
+                  <Td>
+                    <Badge
+                      colorScheme={restaurant.active ? 'green' : 'red'}
+                      variant="solid"
+                    >
+                      {restaurant.active ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </Td>
+                  <Td>
+                    <IconButton
+                      icon={<FaTrash />}
+                      colorScheme="red"
+                      onClick={() => handleDeleteRestaurant(restaurant._id)}
+                    />
+                  </Td>
+                </Tr>
+  )
+}
+
 
 export default AdminRestaurantPage;

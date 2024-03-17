@@ -76,7 +76,6 @@ const userSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: false,
-    select: false,
   },
   accountCreatedAt: Date,
 });

@@ -1,8 +1,22 @@
 import {createApi,fetchBaseQuery} from "@reduxjs/toolkit/query/react"
+import { getToken } from './authUtils';
+
+const BASE_URL = 'http://127.0.0.1:5500/api';
+
+const baseQueryWithToken = fetchBaseQuery({
+  baseUrl: BASE_URL,
+  prepareHeaders: (headers, { getState }) => {
+    const token = getToken(); // Get token
+    if (token) {
+      headers.set('Authorization',`Bearer ${token}`); // Set Authorization header
+    }
+    return headers;
+  },
+});
 
 export const myApi=createApi({
     reducerPath:"api",
-    baseQuery:fetchBaseQuery({baseUrl:process.env.REACT_APP_BASE_URL}),
+    baseQuery:baseQueryWithToken,
     endpoints:(builder)=>({
       //Get requests
       //home routes
@@ -17,7 +31,7 @@ export const myApi=createApi({
       getSearchRes:builder.query({query:()=>"/restaurantsAll"}),
       getSearchFoods:builder.query({query:()=>"/foodsAll"}),
       //admin routes
-      getAllUsers:builder.query({query:()=>"/admin/allUsers"}),
+      getAllUsers:builder.query({query:()=>"/admin/allUser"}),
       getAllRestaurants:builder.query({query:()=>"/admin/allRes"}),
       getPendingReqAdmin:builder.query({query:()=>"/admin/pendingReq"}),
       //cart routes
@@ -29,14 +43,6 @@ export const myApi=createApi({
     
 
       //Post requests
-      //user routes
-      newFoodItem:builder.mutation({
-        query:(id)=>({
-          url:"/users/placeOrder",
-          method:"POST",
-          body:id,
-        })
-      }),
       //restaurant routes
       newFoodItem:builder.mutation({
         query:(food)=>({
@@ -45,21 +51,64 @@ export const myApi=createApi({
           body:food,
         })
       }),
-
+      
+      updateOrderStatus: builder.mutation({
+        query: ({orderId, newStatus}) => ({
+          url: `/restaurants/manageOrders/updateOrderStatus/${orderId}`,
+          method: 'POST',
+          body: { status: newStatus },
+        }),
+      }),
+      //admin routes
+      updateUserStatus: builder.mutation({
+        query: ({userId, newActive}) => ({
+          url: `/admin/allUser/${userId}`,
+          method: 'POST',
+          body: { active: newActive },
+        }),
+      }),
+      acceptPendingReq: builder.mutation({
+        query: (reqId) => ({
+          url: `/admin/pendingReq/${reqId}`,
+          method: 'POST',
+          body: {},
+        }),
+      }),
+     
 
       //Patch Requests
-      changeOrderStatus:builder.mutation({
-        query:({_id,...patch})=>({
-          url:"/restaurants/manageOrders/updateOrderStatus",
-          method:"PATCH",
-          body:patch,
-        })
+      updateItem: builder.mutation({
+        query: ({id,...updatedFields}) => ({
+          url: `/restaurants/manageItems/editItem/${id}`, 
+          method: 'PATCH',
+          body: updatedFields,
+        }),
       }),
-      
+
+     //Delete Requests
+     deleteItem: builder.mutation({
+      query: (itemId) => ({
+        url: `/restaurants/manageItems/deleteItem/${itemId}`,
+        method: 'DELETE',
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: (userId) => ({
+        url: `/admin/allUser/${userId}`,
+        method: 'DELETE',
+      }),
+    }),
+    deleteRes: builder.mutation({
+      query: (resId) => ({
+        url: `/admin/allRes/${resId}`,
+        method: 'DELETE',
+      }),
+    }),
+       
       
       
      })
 })
 
-export const {useNewFoodItemMutation,useGetSearchFoodsQuery,useGetSearchResQuery,useGetHomeRestaurantsQuery,useGetHomeFoodsQuery,useGetAllMenuItemsQuery}=myApi;
+export const {useGetHomeFoodsQuery,useGetHomeRestaurantsQuery,useNewFoodItemMutation,useGetSearchFoodsQuery,useGetAllMenuItemsQuery,useUpdateItemMutation,useGetPreviousOrdersQuery,useGetCurrentOrdersQuery,useUpdateOrderStatusMutation,useDeleteItemMutation,useGetAllUsersQuery,useUpdateUserStatusMutation,useDeleteUserMutation,useGetAllRestaurantsQuery,useDeleteResMutation,useGetPendingReqAdminQuery,useAcceptPendingReqMutation}=myApi;
 
