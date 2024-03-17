@@ -1,3 +1,4 @@
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const Order = require("./../models/orderModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
@@ -67,6 +68,7 @@ exports.prevOrders = catchAsync(async (req, res, next) => {
         // Return modified item details
         return {
           foodName: food.name,
+          foodType: food.type,
           quantity: item.quantity,
           price: item.price,
         };
@@ -79,7 +81,7 @@ exports.prevOrders = catchAsync(async (req, res, next) => {
       _id: order._id,
       restaurantName: restaurant.name,
       items: modifiedItems,
-      // status: order.status,
+      status: order.status,
       rPrice: order.rpice,
       createdAt: formattedTimestamp,
       paymentMode: order.payment,
@@ -116,6 +118,7 @@ exports.currOrders = catchAsync(async (req, res, next) => {
         // Return modified item details
         return {
           foodName: food.name,
+          foodType: food.type,
           quantity: item.quantity,
           price: item.price,
         };
@@ -253,7 +256,6 @@ exports.updateOrderStatus = catchAsync(async (req, res, next) => {
   // const restaurantId = req.restaurant.id;
   const orderId = req.params.id;
   const status = req.body.status;
-  console.log(req.body);
   console.log(status);
   // Check if the status is valid
   const validStatuses = [
@@ -285,7 +287,7 @@ exports.updateOrderStatus = catchAsync(async (req, res, next) => {
   });
 });
 
- 
+
 function formatTimestamp(timestampString) {
   // Convert timestamp string to Date object
   const timestamp = new Date(timestampString);
@@ -305,3 +307,38 @@ function formatTimestamp(timestampString) {
 
   return formattedTimestamp;
 }
+
+exports.getCheckoutSession = catchAsync(async (req, res, next) => {
+  // 1) Get the currently booked tour
+  const userId = req.user.id;
+  const cart = await Cart.findOne({ user: userId })
+  const totalPrice = cart.totalPrice;
+  // // Find the user's cart
+  // const array = Object.entries(await Cart.findOne({ user: userId }));
+  // console.log(array);
+  // const line 
+  // 2) Create checkout session
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: "Cart checkout Success",
+            // Add more product data as needed
+          },
+          unit_amount: Math.round(totalPrice * 100), // Amount in paise
+        },
+        quantity: 1, // Assuming quantity is 1 for now
+      },
+    ],
+    mode: "payment",
+    success_url: "http://localhost:5173/paymentsuccess",
+    cancel_url: "http://localhost:5173/paymentfailure",
+  });
+  // 3) Create session as response
+  res.status(200).json({
+    id:session.id
+  });
+});

@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const multer =require('multer');
+const { log } = require("console");
 // const sharp= require('sharp');
 
 const multerStorage = multer.diskStorage({
@@ -37,12 +38,13 @@ const upload = multer({
 exports.uploadRestaurantPhotos = upload.array('images',3);
 
 exports.resizeRestaurantImages = catchAsync(async (req, res, next) => {
+
   if ( !req.files) return next();
 
   // 2) Images
   req.body.images = [];
 
-  if (req.files && req.files.images) {
+  // if (req.files && req.files.images) {
     // Use Promise.all to wait for all async operations to complete
     await Promise.all(
       req.files.images.map(async (file, i) => {
@@ -50,15 +52,15 @@ exports.resizeRestaurantImages = catchAsync(async (req, res, next) => {
         req.body.images.push(filename);
       })
     );
-  } else {
-    console.error('No images uploaded');
-  }
+  // } else {
+    // console.error('No images uploaded');
+  // }
     // console.log(req.body.images);
   next();
 });
 
 exports.updateImages = catchAsync(async (req, res, next) => {
-  
+  console.log(req.files);
   const files = req.files;
   if(!files)
   return next();
@@ -408,6 +410,30 @@ exports.addItem= catchAsync(async (req, res, next) => {
       res.status(201).send(newFoodItem);
   });
 
+  exports.editItem= catchAsync(async (req, res, next) => {
+    const food = await Food.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+      //if this set to false then the built in validators will not be checked
+    });
+  
+    if (!food) {
+      return next(new AppError("No document found with that ID", 404));
+    }
+    res.status(200).json({
+      status: "success",
+      data: {
+        food,
+      },
+    });
+  });
+
+  exports.deleteItem= catchAsync(async (req, res, next) => {
+    const foodId= req.params.id;
+    await Food.deleteOne({_id:foodId});
+    
+      res.status(201).send('Deleted one item');
+  });
   const filterObj = (obj, ...allowedFields) => {
     const newobj = {};
     Object.keys(obj).forEach((el) => {
