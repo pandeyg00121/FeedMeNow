@@ -77,10 +77,10 @@ const RestaurantDashboard = () => {
             minH={'24'}
             justifyContent={'space-evenly'}
           >
-            <Databox title="Views" qty={123} qtyPercentage={30} profit={true} />
-            <Databox title="Users" qty={23} qtyPercentage={78} profit={true} />
+            <Databox title="Last Month" qty={123} qtyPercentage={30} profit={true} />
+            <Databox title="Last Year" qty={23} qtyPercentage={78} profit={true} />
             <Databox
-              title="Subscription"
+              title="Sales"
               qty={12}
               qtyPercentage={20}
               profit={true}

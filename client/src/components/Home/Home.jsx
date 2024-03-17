@@ -1,5 +1,5 @@
 import { Box, Flex,Heading,useMediaQuery,Text} from '@chakra-ui/react'
-import React from 'react'
+import {useState,useEffect} from 'react'
 import bg from "../../assets/backgroundImages/homepage.jpeg"
 import Navbar from '../Layout/Navbar'
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -15,13 +15,17 @@ import dessert from "../../assets/categories/dessert.jpg"
 import fastfood from "../../assets/categories/fast food.jpg"
 import north from "../../assets/categories/north indian.jpg"
 import south from "../../assets/categories/south indian.jpg"
-import { useGetSearchFoodsQuery } from '../../redux/api';
+import { useGetSearchFoodsQuery, useGetSearchResQuery,useGetHomeRestaurantsQuery,useGetHomeFoodsQuery } from '../../redux/api';
 
 const Home = () => {
   SwiperCore.use([Navigation]);
   const [isLargerThan768]=useMediaQuery("(min-width:768px)")
-  const {isLoading,isError,isSuccess,data,error} = useGetSearchFoodsQuery("");
-  console.log(isLoading,isError,isSuccess,data,error);
+  //const {isLoading,isError,isSuccess,data,error} = useGetSearchFoodsQuery("");
+  const {data:foodsData,isLoading:isLoadingFoods} = useGetHomeFoodsQuery("");
+  const {data:resData,isLoading:isLoadingRes}=useGetHomeRestaurantsQuery("");
+  console.log(resData);
+  const [products,setProducts]=useState([]);
+  const [restaurants,setRestaurants]=useState([]);
 
   const categories=[{
       name:"Chinese",
@@ -48,85 +52,19 @@ const Home = () => {
       pic:north
     }
   ]
+  useEffect(() => {
+    if (!isLoadingFoods && foodsData) {
+        setProducts(foodsData);
+    }
+}, [isLoadingFoods, foodsData]);
 
-  const products=[{
-    _id:1,
-    image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-    name:"burger",
-    type:"non-veg",
-    description:"very tasty burger",
-    price:"100",
-    restaurant:"Tirath",
-    rating:4.5,
-  },{
-    _id:2,
-    image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-    name:"burger",
-    type:"veg",
-    description:"very tasty burger",
-    price:"100",
-    restaurant:"Tirath",
-    rating:3,
-  },
-  {
-    _id:3,
-    image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-    name:"burger",
-    type:"veg",
-    description:"very tasty burger",
-    price:"100",
-    restaurant:"Tirath",
-    rating:2,
-  },
-  {
-    _id:4,
-    image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-    name:"burger",
-    type:"veg",
-    description:"very tasty burger",
-    price:"100",
-    restaurant:"Tirath",
-    rating:1.5,
-  },
-  {
-    _id:5,
-    image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-    name:"burger",
-    type:"veg",
-    description:"very tasty burger",
-    price:"100",
-    restaurant:"Tirath",
-    rating:3,
-  },
-  {
-    _id:6,
-    image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-    name:"burger",
-    type:"veg",
-    description:"very tasty burger",
-    price:"100",
-    restaurant:"Tirath",
-    rating:5,
-  }]
+useEffect(() => {
+  if (!isLoadingRes && resData) {
+      setRestaurants(resData);
+  }
+}, [isLoadingRes, resData]);
 
   
-  const restaurants=[{
-    _id:1,
-    name:"Tirath Raj",
-   profilePic:"https://elchico.in/wp-content/uploads/2022/02/rooftoprest.jpg"
-  },{
-    _id:2,
-    name:"Cafe 96",
-    profilePic:"https://t4.ftcdn.net/jpg/02/94/26/33/360_F_294263329_1IgvqNgDbhmQNgDxkhlW433uOFuIDar4.jpg"
-  },{
-    _id:3,
-    name:"Pillai Canteen",
-    profilePic:"https://assets.architecturaldigest.in/photos/6385cf3311f0276636badfb6/16:9/w_2560%2Cc_limit/DSC_8367-Edit-W.png"
-  },{
-    _id:4,
-    name:"Mr. Dewsis",
-    profilePic:"https://assets.architecturaldigest.in/photos/6385ce336313e32601f141a1/master/w_1600%2Cc_limit/DSC_8597-EDIT%2520-A.jpg"
-  }]
 
   return (
     <Box 
@@ -142,7 +80,7 @@ const Home = () => {
               <SwiperSlide key={index}>
                 <div
                   style={{
-                    background: `url(${restaurant.profilePic}) center no-repeat`,
+                    background: `url(${bg}) center no-repeat`,
                     backgroundSize: 'cover',
                     height: "400px",
                     borderRadius: "20px",
@@ -150,7 +88,7 @@ const Home = () => {
                   }}
                 >
                   <Flex justifyContent="center" backgroundColor="rgba(0,0,0,0.7)" p={2}  borderRadius={"20px"}>
-                  <Link to={`/restaurant/${restaurant._id}`}>
+                  <Link to={`/restaurant/${restaurant.slug}`}>
                   <Heading children={restaurant.name} color={"white"}/>
                   </Link>
                   </Flex>
@@ -178,7 +116,7 @@ const Home = () => {
     </Box>
     <Flex flexWrap="wrap" mt={"8px"} gap={5} marginTop={5}>
         { products && products.slice(0, isLargerThan768 ? 6 : 2).map(product => (
-          <Link to={`/food/${product._id}`}>
+          <Link to={`/food/${product.slug}`}>
           <ProductCard key={product.id} product={product}/>
           </Link>
         ))}

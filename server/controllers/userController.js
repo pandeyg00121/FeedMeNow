@@ -84,13 +84,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   const allUsers = await User.find({ role: { $ne: "admin" } });
 
   // console.log("hellooo");
-  return res.status(200).json({
-    status: "success",
-    result: allUsers.length,
-    data: {
-      data: allUsers,
-    },
-  });
+  return res.status(200).send(allUsers);
 });
 
 exports.updateStatus = catchAsync(async (req, res, next) => {
@@ -166,4 +160,20 @@ exports.userMap = catchAsync(async (req, res, next) => {
     coordinates: user.location.coordinates
   }));
   res.status(200).send(data);
+});
+
+exports.updateStatus = catchAsync(async (req, res, next) => {
+  const newStatus = req.body.active;
+  console.log(req.body);
+  console.log(newStatus);
+  const updatedUser = await User.findByIdAndUpdate(req.params.id, {active:newStatus}, {
+    new: true,
+    runValidators: true,
+  });
+  return res.status(200).json({
+    status: "success",
+    data: {
+      data: updatedUser,
+    },
+  });
 });

@@ -1,81 +1,56 @@
-import { Box, Grid,Heading,TableContainer,Table,TableCaption,Thead,Tr,Th,Tbody,Td,Image,HStack,Button,useDisclosure} from '@chakra-ui/react'
+import { Box, Grid,Heading,TableContainer,Table,TableCaption,Thead,Tr,Th,Tbody,Td,Image,HStack,Button,useDisclosure,Modal,ModalOverlay,ModalHeader,ModalContent,ModalCloseButton,ModalBody,FormControl,FormLabel,Input} from '@chakra-ui/react'
 import {RiDeleteBin7Fill,RiAddCircleFill} from "react-icons/ri"
 import {Link} from "react-router-dom";
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
 import cursor from "../../../assets/cursor red.png"
 import Sidebar from './Sidebar'
 import Footer from '../../Layout/Footer'
+import { useGetAllMenuItemsQuery,useUpdateItemMutation,useDeleteItemMutation } from '../../../redux/api';
+
+const fileUploadCss={
+  cursor:"pointer",
+  marginLeft:"-5%",
+  width:"110%",
+  border:'none',
+  height:'100%',
+  color:'#ECC94B',
+  backgroundColor:'teal'
+}
 
 
 const ManageItems = () => {
     
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const {isLoading,data:itemData}=useGetAllMenuItemsQuery("")
+    console.log(isLoading,itemData);
 
-    const data=[{
-        _id:1,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"non-veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:4.5,
-      },{
-        _id:2,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:3,
-      },
-      {
-        _id:3,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:2,
-      },
-      {
-        _id:4,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:1.5,
-      },
-      {
-        _id:5,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:3,
-      },
-      {
-        _id:6,
-        image:"https://media.istockphoto.com/id/1309352410/photo/cheeseburger-with-tomato-and-lettuce-on-wooden-board.jpg?s=612x612&w=0&k=20&c=lfsA0dHDMQdam2M1yvva0_RXfjAyp4gyLtx4YUJmXgg=",
-        name:"Burger",
-        type:"veg",
-        description:"very tasty burger",
-        price:"100",
-        restaurant:"Tirath",
-        rating:5,
-      }]
-
-      const [items,setItems]=useState(data);
-
-      const deleteItem = (id) => {
-        const updatedItems = items.filter((item) => item._id !== id);
+      const [items,setItems]=useState([]);
+      const [selectedItem, setSelectedItem] = useState(null);
+      const [deleteItemMutation]=useDeleteItemMutation();
+      useEffect(() => {
+        if (!isLoading && itemData) {
+            setItems(itemData);
+        }
+    }, [isLoading, itemData]);
+      
+      
+      const deleteItem = async (id) => {
+        try {
+          await deleteItemMutation(id);
+          const updatedItems = items.filter((item) => item._id !== id);
         setItems(updatedItems);
+        } catch (error) {
+          console.log(error);
+        }
+        };
+
+      const handleEdit = (item) => {
+        setSelectedItem(item);
+        onOpen();
+      };
+
+      const handleSubmit = (updatedItem) => {
+        onClose();
       };
 
   return (
@@ -106,7 +81,7 @@ const ManageItems = () => {
           <Tbody>
            {
             items.map(item=>(
-              <Row  key={item._id} item={item} deleteItem={deleteItem}/>
+              <Row  key={item._id} item={item} deleteItem={deleteItem} handleEdit={handleEdit}/>
             ))
            }
           </Tbody>
@@ -116,11 +91,12 @@ const ManageItems = () => {
       <Sidebar/>
     </Grid>
     <Footer/>
+    <EditItemModal isOpen={isOpen} onClose={onClose} item={selectedItem} handleSubmit={handleSubmit} />
     </>
   )
 }
 
-function Row({item,deleteItem}){
+function Row({item,deleteItem,handleEdit}){
     const handleDelete=()=>{
         deleteItem(item._id);
     }
@@ -137,7 +113,7 @@ function Row({item,deleteItem}){
          <HStack
          justifyContent={"flex-end"}
          >
-          <Button  variant={"outline"} color={"green.500"}>Edit Item</Button>
+          <Button  variant={"outline"} color={"green.500"} onClick={() => handleEdit(item)}>Edit Item</Button>
           <Button  color={"red.500"} onClick={handleDelete}>
             <RiDeleteBin7Fill/>
           </Button>
@@ -156,6 +132,85 @@ function Row({item,deleteItem}){
         </Button>
       </Link>
     )
+}
+
+function EditItemModal({ isOpen, onClose, item, handleSubmit }) {
+  const [updatedItem, setUpdatedItem] = useState(item || {});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(item?.image || '');
+  const [updateItem, { isLoading }] = useUpdateItemMutation(); // Mutation hook
+
+  useEffect(() => {
+    setUpdatedItem(item || {});
+    setImagePreview(item?.image || '');
+  }, [item]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedItem({ ...updatedItem, [name]: value });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleFormSubmit = async () => {
+    try {
+      const updatedFields = { ...updatedItem };
+      if (selectedImage) {
+        // If a new image is selected, add it to the updated fields
+        updatedFields.image = selectedImage;
+      }
+
+
+      // Call the mutation hook to update the item
+      const response = await updateItem({ id: updatedItem._id, ...updatedFields });
+      if (response) {
+        handleSubmit(updatedFields);
+        onClose();
+      }
+    } catch (error) {
+      console.error('Error updating item:', error);
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Edit Item</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <FormControl>
+            <FormLabel>Item Name</FormLabel>
+            <Input name="name" value={updatedItem.name} onChange={handleChange} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Item Type</FormLabel>
+            <Input name="type" value={updatedItem.type} onChange={handleChange} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Item Price</FormLabel>
+            <Input name="price" value={updatedItem.price} onChange={handleChange} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Item Image</FormLabel>
+            <Input
+              accept="image/*"
+              type="file"
+              onChange={handleImageChange}
+            />
+            {imagePreview && <Image src={imagePreview} alt="Item Preview" maxH={100} mt={2} />}
+          </FormControl>
+          <Button mt={4} colorScheme="teal" onClick={handleFormSubmit} isLoading={isLoading}>
+            Save Changes
+          </Button>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
 }
 
 export default ManageItems;

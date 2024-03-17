@@ -25,15 +25,15 @@ router.delete("/manageItems/deleteItem/:id", restaurantController.deleteItem);
 //Order routes
 router.get("/manageOrders/previous" , orderController.resPrevOrders);
 router.get("/manageOrders/current" , orderController.resCurrOrders );
-router.patch("/manageOrders/updateOrderStatus/:id", orderController.updateOrderStatus);
 
+router.post("/manageOrders/updateOrderStatus/:id", orderController.updateOrderStatus);
 router.patch("/updateMyPassword",restaurantController.updatePassword);
 router.get("/me", restaurantController.getMe,restaurantController.getRestaurant);
 router.patch("/updateMe",  restaurantController.uploadRestaurantPhotos,restaurantController.resizeRestaurantImages ,restaurantController.updateImages);
 router.patch("/closeMe", restaurantController.closeMe);
 router.patch("/openMe", restaurantController.openMe);
 
-router.get("/myReviews", reviewController.resReviews);
+// router.get("/myReviews", reviewController.resReviews);
 
 
 
@@ -41,4 +41,5 @@ router.get("/myReviews", reviewController.resReviews);
 //router.get('/currentOrders)
 
 module.exports = router;
+
 
