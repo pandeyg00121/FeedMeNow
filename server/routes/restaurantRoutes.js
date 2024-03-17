@@ -18,13 +18,14 @@ router.patch("/resetPassword/:token", restaurantController.resetPassword);
 router.use(restaurantController.protect); 
 
 router.get('/dashboard',restaurantController.dashboard);
-router.get('/manageItems',restaurantController.manageItems);
 router.post("/addItem", restaurantController.addItem);
-
+router.get('/manageItems',restaurantController.manageItems);
+router.patch("/manageItems/editItem/:id", restaurantController.editItem);
+router.delete("/manageItems/deleteItem/:id", restaurantController.deleteItem);
 //Order routes
 router.get("/manageOrders/previous" , orderController.resPrevOrders);
 router.get("/manageOrders/current" , orderController.resCurrOrders );
-router.patch("/manageOrders/updateOrderStatus/", orderController.updateOrderStatus);
+router.patch("/manageOrders/updateOrderStatus/:id", orderController.updateOrderStatus);
 
 router.patch("/updateMyPassword",restaurantController.updatePassword);
 router.get("/me", restaurantController.getMe,restaurantController.getRestaurant);
@@ -41,8 +42,3 @@ router.get("/myReviews", reviewController.resReviews);
 
 module.exports = router;
 
-//dashboard of restaurant will have
-// Reviews
-//their already listed food
-//Their orders(completed + current + cancelled)
-//their details + restaurant pics

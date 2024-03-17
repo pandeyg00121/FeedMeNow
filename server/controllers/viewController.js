@@ -38,7 +38,7 @@ exports.getRestaurant = catchAsync(async (req, res) => {
 //     fields: "review rating user",
 //   });
 const restId=restaurantObject._id;
-const foods = await Food.find({restaurant:restId}).select("-restaurant");
+const foods = await Food.find({restaurant:restId});
 const restaurantInfo = {
   name: restaurantObject.name,
   address: restaurantObject.location.address,

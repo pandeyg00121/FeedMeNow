@@ -17,13 +17,14 @@ router.get("/me", userController.getMe);
 router.use(authController.restrictTo('admin'));
 
 router.get("/allUser",userController.getAllUsers)
+router.post('/allUser/:id',userController.updateStatus)
 router.get("/allUser/:id",userController.getUser)
 // router.patch(userController.updateUser)
 router.delete("/allUser/:id",userController.deleteUser);
 router.get('/userMap',userController.userMap);
 
 router.get("/pendingReq",restaurantController.getAllPendingRestaurants)
-router.patch("/pendingReq/:id",restaurantController.approvePendingRestaurants)
+router.post("/pendingReq/:id",restaurantController.approvePendingRestaurants)
 
 
 router.get("/allRes",restaurantController.getAllRestaurants)
