@@ -1,5 +1,5 @@
 import { Box, Flex,Heading,useMediaQuery,Text} from '@chakra-ui/react'
-import React from 'react'
+import {useState,useEffect} from 'react'
 import bg from "../../assets/backgroundImages/homepage.jpeg"
 import Navbar from '../Layout/Navbar'
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -21,9 +21,11 @@ const Home = () => {
   SwiperCore.use([Navigation]);
   const [isLargerThan768]=useMediaQuery("(min-width:768px)")
   //const {isLoading,isError,isSuccess,data,error} = useGetSearchFoodsQuery("");
-  const {data:foodsData} = useGetHomeFoodsQuery("");
-  const {data:resData}=useGetHomeRestaurantsQuery("");
+  const {data:foodsData,isLoading:isLoadingFoods} = useGetHomeFoodsQuery("");
+  const {data:resData,isLoading:isLoadingRes}=useGetHomeRestaurantsQuery("");
   console.log(resData);
+  const [products,setProducts]=useState([]);
+  const [restaurants,setRestaurants]=useState([]);
 
   const categories=[{
       name:"Chinese",
@@ -50,11 +52,19 @@ const Home = () => {
       pic:north
     }
   ]
+  useEffect(() => {
+    if (!isLoadingFoods && foodsData) {
+        setProducts(foodsData);
+    }
+}, [isLoadingFoods, foodsData]);
 
-  const products=foodsData;
+useEffect(() => {
+  if (!isLoadingRes && resData) {
+      setRestaurants(resData);
+  }
+}, [isLoadingRes, resData]);
 
   
-  const restaurants=resData;
 
   return (
     <Box 

@@ -17,6 +17,7 @@ export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware()
       .concat(authUserApi.middleware)
+      .concat(myApi.middleware)
       .concat(authRestaurantApi.middleware),
 
   devTools: true,

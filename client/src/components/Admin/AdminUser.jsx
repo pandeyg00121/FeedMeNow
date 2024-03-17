@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
 import Sidebar from './Sidebar';
+import {useGetAllUsersQuery,useUpdateUserStatusMutation,useDeleteUserMutation} from "../../redux/api"
 
 // Simulated user data
 const usersData = [
@@ -44,32 +45,25 @@ const usersData = [
 
 const AdminUsersPage = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const {data,isLoading}=useGetAllUsersQuery("");
+  const [deleteUserMutation]=useDeleteUserMutation();
+  console.log(data);
 
   useEffect(() => {
-    // Simulate fetching user data from an API or database
-    // In a real-world scenario, you would fetch this data from your server
-    // For demonstration purposes, using a timeout to simulate an asynchronous operation
-    const fetchData = async () => {
-      try {
-        // Simulating an asynchronous data fetch
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setUsers(usersData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        setLoading(false);
-      }
-    };
+    if(!isLoading && data){
+      setUsers(data);
+    }
+  }, [isLoading,data]);
 
-    fetchData();
-  }, []);
-
-  const handleDeleteUser = userId => {
-    // In a real-world scenario, you would send a request to your backend to delete the user
-    // For demonstration purposes, simply updating the state here
-    setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+  const deleteUser = async (userId) => {
+    try {
+      await deleteUserMutation(userId);
+      const updatedUsers = users.filter((user) => user._id !== userId);
+    setUsers(updatedUsers);
+    } catch (error) {
+      console.log(error);
+    }
 
     toast({
       title: 'User Deleted',
@@ -80,23 +74,7 @@ const AdminUsersPage = () => {
     });
   };
 
-  const handleStatusChange = userId => {
-    // In a real-world scenario, you would send a request to your backend to update the user's status
-    // For demonstration purposes, simply updating the state here
-    setUsers(prevUsers =>
-      prevUsers.map(user =>
-        user.id === userId ? { ...user, isActive: !user.isActive } : user
-      )
-    );
-
-    toast({
-      title: 'Status Updated',
-      description: `Status for User with ID ${userId} has been updated.`,
-      status: 'info',
-      duration: 3000,
-      isClosable: true,
-    });
-  };
+ 
 
   return (
     <Grid templateColumns="1fr auto" gap="4" height="100vh">
@@ -112,7 +90,7 @@ const AdminUsersPage = () => {
           Admin Users Page
         </Heading>
 
-        {loading ? (
+        {isLoading ? (
           <Spinner size="lg" color="teal.500" />
         ) : (
           <Table variant="simple" mt="4" fontSize="lg" width="100%">
@@ -130,42 +108,7 @@ const AdminUsersPage = () => {
             </Thead>
             <Tbody>
               {users.map(user => (
-                <Tr key={user.id}>
-                  <Td>{user.id}</Td>
-                  <Td>
-                    <Avatar
-                      size="md"
-                      name={user.username}
-                      src={user.profilePic}
-                    />
-                  </Td>
-                  <Td>{user.username}</Td>
-                  <Td>{user.location}</Td>
-                  <Td>{user.email}</Td>
-                  <Td>{user.gender}</Td>
-                  <Td>
-                    <Switch
-                      colorScheme="teal"
-                      isChecked={user.isActive}
-                      onChange={() => handleStatusChange(user.id)}
-                    />
-                  </Td>
-                  <Td>
-                    <Badge
-                      colorScheme={user.isActive ? 'green' : 'red'}
-                      variant="solid"
-                    >
-                      {user.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </Td>
-                  <Td>
-                    <IconButton
-                      icon={<FaTrash />}
-                      colorScheme="red"
-                      onClick={() => handleDeleteUser(user.id)}
-                    />
-                  </Td>
-                </Tr>
+                <Row key={user._id} user={user} deleteUser={deleteUser}/>
               ))}
             </Tbody>
           </Table>
@@ -175,5 +118,64 @@ const AdminUsersPage = () => {
     </Grid>
   );
 };
+
+function Row({user,deleteUser}){
+  const [status, setStatus] = useState(user.active);
+  const [updateUserStatus] = useUpdateUserStatusMutation();
+
+  const handleStatusChange = async () => {
+    const newStatus=!status;
+    try {
+    console.log(newStatus);
+    await updateUserStatus({userId:user._id,newActive:newStatus});
+    setStatus(newStatus);
+    } catch (error) {
+      console.log(error);
+    }
+    
+  };
+  const handleDelete=()=>{
+    deleteUser(user._id);
+}
+
+  return(
+    <Tr key={user._id}>
+                  <Td>{user._id}</Td>
+                  <Td>
+                    <Avatar
+                      size="md"
+                      name={user.name}
+                      src={user.profilePic}
+                    />
+                  </Td>
+                  <Td>{user.name}</Td>
+                  <Td>{user.location.address}</Td>
+                  <Td>{user.email}</Td>
+                  <Td>{user.gender}</Td>
+                  <Td>
+                    <Switch
+                      colorScheme="teal"
+                      isChecked={user.active}
+                      onChange={(e)=>handleStatusChange()}
+                    />
+                  </Td>
+                  <Td>
+                    <Badge
+                      colorScheme={user.active ? 'green' : 'red'}
+                      variant="solid"
+                      >
+                      {user.active ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </Td>
+                  <Td>
+                    <IconButton
+                      icon={<FaTrash />}
+                      colorScheme="red"
+                      onClick={() => handleDelete()}
+                    />
+                  </Td>
+                </Tr>
+  )
+}
 
 export default AdminUsersPage;

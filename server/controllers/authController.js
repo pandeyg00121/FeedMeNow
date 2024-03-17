@@ -83,7 +83,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   console.log(user.active);
 
-  if (user.active) {
+  if (!user.active) {
     return next(
       new AppError(
         `Your Email is not verified yet Check your ${user.email} for link `,

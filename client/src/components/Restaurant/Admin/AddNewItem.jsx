@@ -3,6 +3,7 @@ import {useState} from 'react'
 import cursor from "../../../assets/cursor red.png"
 import Sidebar from './Sidebar'
 import { useNewFoodItemMutation } from '../../../redux/api'
+import {useNavigate} from "react-router-dom"
 
 export const fileUploadCss={
     cursor:"pointer",
@@ -23,6 +24,7 @@ const AddNewItem = () => {
   const [category,setCategory]=useState("");
   const [image,setImage]=useState("");
   const [imagePrev,setImagePrev]=useState("");
+  const navigate=useNavigate();
 
   const categories=[
     'Chinese',
@@ -62,6 +64,7 @@ const changeImageHandler=(e)=>{
     setDescription("");
     setImage("");
     setImagePrev("");
+    navigate('/restaurant/manageitems');
   }
 
   return (

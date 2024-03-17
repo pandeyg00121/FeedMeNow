@@ -391,14 +391,7 @@ exports.openMe = catchAsync(async (req, res, next) => {
 exports.getAllRestaurants = catchAsync(async (req,res,next)=>{ 
   const allRestaurants= await Restaurant.find({ active: true });
   
-  return res.status(200).json({
-      status:'success',
-      result: allRestaurants.length,
-      data:{
-          data : allRestaurants
-      }
-
-    });
+  return res.status(200).send(allRestaurants);
 });   
 
 exports.addItem= catchAsync(async (req, res, next) => {
@@ -427,13 +420,7 @@ exports.addItem= catchAsync(async (req, res, next) => {
 exports.getAllPendingRestaurants = catchAsync(async (req,res,next)=>{ 
   const allPendingRestaurants= await Restaurant.find({ active: false });
   
-  return res.status(200).json({
-      status:'success',
-      result: allPendingRestaurants.length,
-      data:{
-          data : allPendingRestaurants
-      }
-  });
+  return res.status(200).send(allPendingRestaurants)
 });
 
 exports.approvePendingRestaurants = catchAsync(async (req,res,next)=>{ 
@@ -457,4 +444,29 @@ exports.resMap = catchAsync(async (req, res, next) => {
     coordinates: restaurant.location.coordinates
   }));
   res.status(200).send(data);
+});
+
+exports.editItem= catchAsync(async (req, res, next) => {
+  const food = await Food.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+    //if this set to false then the built in validators will not be checked
+  });
+
+  if (!food) {
+    return next(new AppError("No document found with that ID", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      food,
+    },
+  });
+});
+
+exports.deleteItem= catchAsync(async (req, res, next) => {
+  const foodId= req.params.id;
+  await Food.deleteOne({_id:foodId});
+  
+    res.status(201).send('Deleted one item');
 });
