@@ -132,7 +132,7 @@ function Row({user,deleteUser}){
     } catch (error) {
       console.log(error);
     }
-    
+    window.location.reload();
   };
   const handleDelete=()=>{
     deleteUser(user._id);

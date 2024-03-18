@@ -47,7 +47,7 @@ const SignUpUser = () => {
     } else {
       try {
         await signup(userData).unwrap();
-        navigate('/');
+        navigate('/users/login');
       } catch (err) {
         console.log(err?.data?.message || err.error);
       }

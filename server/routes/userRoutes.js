@@ -23,10 +23,14 @@ router.use(authController.protect);
 // router.use(cartController.getCart);
 
 router.use("/cart", cartRouter);
-router.get('/restoreCart',)
-router.patch("/updateMyPassword",authController.updatePassword);
+
+
+router.post("/updateMyPassword",authController.updatePassword);
 router.get("/me", userController.getMe,userController.getUser);
-router.patch("/updateMe",upload.single('profilePic') ,userController.updateMe);
+router.post("/updateMe",userController.uploadUserPhoto ,userController.updateMe);
+
+router.get('/restoreCart',)
+
 router.delete("/deleteMe", userController.deleteMe);
 // ------------------------>
 router.use("/booking", orderRouter);

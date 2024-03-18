@@ -2,8 +2,9 @@ const Order = require("./../models/orderModel");
 const Review = require("./../models/reviewModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
-const Restaurant = require("../models/restaurantModel");
-const Food = require('./../models/foodModel')
+const Food=require("./../models/foodModel")
+const Restaurant=require("./../models/restaurantModel")
+
 // Add a review
 exports.addReview = catchAsync(async (req, res, next) => {
   const { review, rating} = req.body;
@@ -24,12 +25,14 @@ exports.addReview = catchAsync(async (req, res, next) => {
     rating,
     order: orderId,
   });
-  console.log(newReview);
+  // console.log(newReview);
+
   const order = await Order.findById(orderId);
   const restaurant = await Restaurant.findById(order.restaurant);
 
   // Update the restaurant's reviews and ratingsAverage
   restaurant.reviews.push(newReview._id);
+
   restaurant.ratingsQuantity += 1;
   const f= ((restaurant.ratingsAverage * (restaurant.ratingsQuantity - 1)) + rating) / restaurant.ratingsQuantity;
   restaurant.ratingsAverage =f;
@@ -46,6 +49,7 @@ exports.addReview = catchAsync(async (req, res, next) => {
 exports.myReviews = catchAsync(async (req, res, next) => {
 
   const userId = req.user.id;
+
 
   const review = await Review.find({ user: userId }).populate('order');
   const populatedReviews = await Promise.all(review.map(async (item) => {
@@ -72,6 +76,7 @@ exports.myReviews = catchAsync(async (req, res, next) => {
 
 
   res.status(200).send(populatedReviews);
+
 });
 
 //Restaurant can see their reviews on delivered orders

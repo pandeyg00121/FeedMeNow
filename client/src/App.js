@@ -18,6 +18,11 @@ import SignUpUser from './components/Auth/SignUp/SignUpUser';
 import SignUpRestaurant from './components/Auth/SignUp/SignUpRestaurant';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import PrivateRouteAdmin from './components/PrivateRouteAdmin.jsx';
+import Profile from './components/User/Profile.jsx';
+import CurrentOrdersUser from './components/User/CurrentOrderUser.jsx';
+import PreviousOrdersUser from './components/User/PreviousOrdersUser.jsx';
+import Reviews from './components/User/Reviews.jsx';
+import PrivateRouteUser from './components/PrivateRouteUser.jsx';
 
 
 function App() {
@@ -33,6 +38,16 @@ function App() {
             <Route path="/restaurant/currentorders" element={<CurrentOrders />} />
             <Route path="/restaurant/previousorders" element={<PreviousOrders />} />
           </Route>
+          
+          <Route path='' element={<PrivateRouteUser/>}>
+          <Route path="/user/profile" element={<Profile/>}>
+          <Route path="current-order" element={<CurrentOrdersUser />} />
+          <Route path="previous-orders" element={<PreviousOrdersUser />} />
+          <Route path="my-reviews" element={<Reviews />} />
+          </Route>
+        </Route>
+
+          
         
 
         {/* Auth Routes */}

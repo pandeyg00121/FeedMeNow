@@ -37,6 +37,7 @@ export const myApi=createApi({
       //cart routes
       getMyCart:builder.query({query:()=>"/users/cart"}),
       //user routes
+      getUser:builder.query({query:()=>"/users/me"}),
       getUserReviews:builder.query({query:()=>"/users/myReviews"}),
       getUserPrevOrders:builder.query({query:()=>"/users/prevOrders"}),
       getUserCurrOrders:builder.query({query:()=>"/users/currOrders"}),
@@ -74,6 +75,27 @@ export const myApi=createApi({
           body: {},
         }),
       }),
+      addReview:builder.mutation({
+        query:({orderId,review})=>({
+          url:`/users/prevOrders/review/${orderId}`,
+          method:"POST",
+          body:review,
+        })
+      }),
+      updatePassword:builder.mutation({
+        query:(password)=>({
+          url:`/users/updateMyPassword`,
+          method:"POST",
+          body:password,
+        })
+      }),
+      updateProfile:builder.mutation({
+        query:(user)=>({
+          url:`/users/updateMe`,
+          method:"POST",
+          body:user,
+        })
+      }),
      
 
       //Patch Requests
@@ -110,5 +132,6 @@ export const myApi=createApi({
      })
 })
 
-export const {useGetHomeFoodsQuery,useGetHomeRestaurantsQuery,useNewFoodItemMutation,useGetSearchFoodsQuery,useGetAllMenuItemsQuery,useUpdateItemMutation,useGetPreviousOrdersQuery,useGetCurrentOrdersQuery,useUpdateOrderStatusMutation,useDeleteItemMutation,useGetAllUsersQuery,useUpdateUserStatusMutation,useDeleteUserMutation,useGetAllRestaurantsQuery,useDeleteResMutation,useGetPendingReqAdminQuery,useAcceptPendingReqMutation}=myApi;
+export const {useGetHomeFoodsQuery,useGetHomeRestaurantsQuery,useNewFoodItemMutation,useGetSearchFoodsQuery,useGetAllMenuItemsQuery,useUpdateItemMutation,useGetPreviousOrdersQuery,useGetCurrentOrdersQuery,useUpdateOrderStatusMutation,useDeleteItemMutation,useGetAllUsersQuery,useUpdateUserStatusMutation,useDeleteUserMutation,useGetAllRestaurantsQuery,useDeleteResMutation,useGetPendingReqAdminQuery,useAcceptPendingReqMutation,useGetUserPrevOrdersQuery,useGetUserCurrOrdersQuery,
+useGetUserReviewsQuery,useGetUserQuery,useAddReviewMutation,useUpdatePasswordMutation,useUpdateProfileMutation}=myApi;
 
