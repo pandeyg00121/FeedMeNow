@@ -45,7 +45,12 @@ const LoginUser = () => {
   const { userInfo } = useSelector(state => state.authuser);
   useEffect(() => {
     if (userInfo) {
-      navigate('/');
+      if (userInfo.data.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      }
+      if (userInfo.data.user.role === 'user') {
+        navigate('/');
+      }
     }
   }, [navigate, userInfo]);
   const handleTogglePassword = () => {

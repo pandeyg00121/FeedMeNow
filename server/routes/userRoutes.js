@@ -20,13 +20,13 @@ router.use(authController.protect);
 
 router.use("/cart", cartRouter);
 
-router.patch("/updateMyPassword",authController.updatePassword);
+router.post("/updateMyPassword",authController.updatePassword);
 router.get("/me", userController.getMe,userController.getUser);
-router.patch("/updateMe",userController.uploadUserPhoto ,userController.updateMe);
+router.post("/updateMe",userController.uploadUserPhoto ,userController.updateMe);
 router.delete("/deleteMe", userController.deleteMe);
 // ------------------------>
 router.post("/placeOrder", orderController.placeOrder);
-router.post("/prevOrders/review", reviewController.addReview);
+router.post("/prevOrders/review/:id", reviewController.addReview);
 router.get("/myReviews", reviewController.myReviews);
 router.get("/prevOrders", orderController.prevOrders);
 router.get("/currOrders", orderController.currOrders);

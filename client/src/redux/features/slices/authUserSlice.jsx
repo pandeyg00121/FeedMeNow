@@ -11,6 +11,7 @@ const authUserSlice = createSlice({
     setCredentialsuser: (state, action) => {
       state.userInfo = action.payload;
       localStorage.setItem('userInfo', JSON.stringify(action.payload));
+      localStorage.setItem('cartItems',JSON.stringify(action.payload.cart))
     },
     logoutuserdata: (state, action) => {
       state.userInfo = null;

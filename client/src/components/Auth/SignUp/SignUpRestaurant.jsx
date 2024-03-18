@@ -47,7 +47,7 @@ const SignUpRestaurant = () => {
     } else {
       try {
         await signup(restaurantdata).unwrap();
-        navigate('/');
+        navigate('/restaurants/login');
       } catch (err) {
         console.log(err?.data?.message || err.error);
       }

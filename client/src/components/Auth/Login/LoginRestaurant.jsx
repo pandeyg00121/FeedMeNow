@@ -43,11 +43,7 @@ const LoginRestaurant = () => {
   const [forgotPassword, { isLoadingpass, isErrorpass }] =
     useForgotPasswordMutation();
   const { restaurantInfo } = useSelector(state => state.authrestaurant);
-  useEffect(() => {
-    if (restaurantInfo) {
-      navigate('/');
-    }
-  }, [navigate, restaurantInfo]);
+  
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
@@ -69,7 +65,7 @@ const LoginRestaurant = () => {
     try {
       const res = await login(formData).unwrap();
       dispatch(setCredentialsrestaurant({ ...res }));
-      navigate('/');
+      navigate('/restaurant/dashboard');
     } catch (err) {
       console.error(err?.data?.message || err.error);
     }

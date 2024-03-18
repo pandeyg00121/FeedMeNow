@@ -12,10 +12,26 @@ import {
   RiMapFill,
 } from 'react-icons/ri';
 import { Link, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useLogoutMutation } from '../../redux/features/slices/authUserApi';
+import { logoutuserdata } from '../../redux/features/slices/authUserSlice';
 
 const Sidebar = () => {
   const location = useLocation();
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [logout] = useLogoutMutation();
+  const logoutHandler = async () => {
+    try {
+      await logout();
+      dispatch(logoutuserdata());
+      navigate('/');
+      console.log('loggedout');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
   return (
     <VStack spacing={8} p={16} boxShadow={'-3px 0 12px rgba(255, 199, 0,0.6)'}>
       <LinkButton
@@ -48,12 +64,16 @@ const Sidebar = () => {
         url="usermap"
         active={location.pathname === '/admin/usermap'}
       />
-      <LinkButton
-        Icon={RiLogoutBoxFill}
-        text={'Log Out'}
-        url="logout"
-        active={location.pathname === '/admin/logout'}
-      />
+      <Button
+        variant={'ghost'}
+        onClick={logoutHandler}
+        color={'red.500'}
+        fontWeight={'bold'}
+        size={'md'}
+      >
+        <RiLogoutBoxFill />
+        Logout
+      </Button>
     </VStack>
   );
 };

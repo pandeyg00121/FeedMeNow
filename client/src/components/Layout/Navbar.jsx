@@ -38,8 +38,7 @@ const LinkButton = ({ url = '/', title = 'Home', onClose }) => (
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [searchTerm, setSearchTerm] = useState('');
-  const location = useLocation();
+  
   const isAuthenticated = true;
   const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
@@ -59,21 +58,7 @@ const Navbar = () => {
       console.error('Logout failed:', error);
     }
   };
-  const navigate = useNavigate();
-  const handleSubmit = e => {
-    e.preventDefault();
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('searchTerm', searchTerm);
-    const searchQuery = urlParams.toString();
-    navigate(`/search?${searchQuery}`);
-  };
-  useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const searchTermFromUrl = urlParams.get('searchTerm');
-    if (searchTermFromUrl) {
-      setSearchTerm('');
-    }
-  }, [location.search]);
+ 
 
   return (
     <HStack
@@ -93,30 +78,6 @@ const Navbar = () => {
           />
         </Link>
       </Box>
-      {/*Center*/}
-      <HStack alignItems={'center'}>
-        <form onSubmit={handleSubmit}>
-          <Input
-            type="text"
-            value={searchTerm}
-            placeholder="Search for food..."
-            sx={{ '&::placeholder': { color: 'black' } }}
-            size={['sm', 'md']}
-            variant="filled"
-            bg="rgba(245, 247, 248,0.8)"
-            width={{ base: 'full', md: 'md' }}
-            focusBorderColor="blue.700"
-            _hover="none"
-            _focus={{ bg: 'rgba(245, 247, 248,0.8)' }}
-            textColor="black"
-            borderRadius="lg"
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-          <Button variant={'ghost'} type="submit">
-            <FaSearch size={23} color="white" />
-          </Button>
-        </form>
-      </HStack>
       {/*Right Side*/}
       <Stack direction="col">
         {user && user.role === 'user' && (
@@ -154,6 +115,10 @@ const Navbar = () => {
             <DrawerBody mt={5}>
               <VStack spacing={'8'} alignItems={'flex-start'}>
                 <LinkButton onClose={onClose} url="/" title="Home" />
+                <LinkButton onClose={onClose} url="/user/profile" title="My Profile" />
+                <LinkButton onClose={onClose} url="/foods" title="All Foods" />
+                <LinkButton onClose={onClose} url="/restaurants" title="All Restaurants" />
+                <LinkButton onClose={onClose} url="/user/viewcart" title="My Cart" />
                 <HStack
                   justifyContent={'space-evenly'}
                   position={'absolute'}
@@ -163,32 +128,6 @@ const Navbar = () => {
                   {isAuthenticated ? (
                     <>
                       <VStack>
-                        {user && user.role === 'admin' && (
-                          <Link onClick={onClose} to="/admin/dashboard">
-                            <Button
-                              colorScheme="purple"
-                              variant={'ghost'}
-                              fontWeight={'bold'}
-                              size={'md'}
-                            >
-                              <RiDashboardFill style={{ margin: '4px' }} />
-                              Dashboard
-                            </Button>
-                          </Link>
-                        )}
-                        {user && user.role === 'restaurant' && (
-                          <Link onClick={onClose} to="/restaurant/dashboard">
-                            <Button
-                              colorScheme="purple"
-                              variant={'ghost'}
-                              fontWeight={'bold'}
-                              size={'md'}
-                            >
-                              <RiDashboardFill style={{ margin: '4px' }} />
-                              Dashboard
-                            </Button>
-                          </Link>
-                        )}
                         <Button
                           variant={'ghost'}
                           onClick={logoutHandler}

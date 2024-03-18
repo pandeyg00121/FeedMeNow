@@ -9,11 +9,11 @@ const authRestaurantSlice = createSlice({
   initialState,
   reducers: {
     setCredentialsrestaurant: (state, action) => {
-      state.userInfo = action.payload;
+      state.restaurantInfo = action.payload;
       localStorage.setItem('restaurantInfo', JSON.stringify(action.payload));
     },
     logoutrestaurantdata: (state, action) => {
-      state.userInfo = null;
+      state.restaurantInfo = null;
       localStorage.removeItem('restaurantInfo');
     },
   },

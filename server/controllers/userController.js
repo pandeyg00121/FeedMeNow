@@ -71,12 +71,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
     return next(new AppError("No document found with that ID", 404));
   }
 
-  res.status(200).json({
-    status: "success",
-    data: {
-      user,
-    },
-  });
+  res.status(200).send(user);
 });
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
@@ -102,8 +97,6 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log(req.file);
-  console.log(req.body);
   //1) Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
@@ -113,18 +106,16 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       )
     );
   }
-  //2) Filtering out unwanted field names that are not allowed to be updated
-  const filteredBody = filterObj(req.body, "name", "gender" , "active");
-  if(req.file)  filteredBody.profilePic = req.file.filename;
-  //3) update user document
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true,
-    runValidators: true,
-  });
+  //2) Update user document
+  console.log(req.body);
+  const user = await User.findById(req.user.id);
+  user.name = req.body.name;
+  user.location.address = req.body.address;
+  await user.save();
   res.status(200).json({
     status: "success",
     data: {
-      user: updatedUser,
+      user: user,
     },
   });
 });

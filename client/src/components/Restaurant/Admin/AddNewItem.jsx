@@ -22,8 +22,6 @@ const AddNewItem = () => {
   const [price,setPrice]=useState("");
   const [type,setType]=useState("");
   const [category,setCategory]=useState("");
-  const [image,setImage]=useState("");
-  const [imagePrev,setImagePrev]=useState("");
   const navigate=useNavigate();
 
   const categories=[
@@ -35,15 +33,6 @@ const AddNewItem = () => {
     'Fast-food' ]
 
 
-const changeImageHandler=(e)=>{
-    const file=e.target.files[0];
-    const reader=new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend=()=>{
-        setImagePrev(reader.result);
-        setImage(file)
-    }
-  }
 
   const submitHandler=(e)=>{
     e.preventDefault();
@@ -52,8 +41,7 @@ const changeImageHandler=(e)=>{
       type:type,
       category:category,
       price:price,
-      description:description,
-      image:image
+      description:description
     }
     newFoodItem(foodItem);
     
@@ -62,8 +50,6 @@ const changeImageHandler=(e)=>{
     setCategory("");
     setPrice("");
     setDescription("");
-    setImage("");
-    setImagePrev("");
     navigate('/restaurant/manageitems');
   }
 
@@ -110,22 +96,6 @@ const changeImageHandler=(e)=>{
         <option key={item} value={item}>{item}</option>
        ))}
        </Select>
-       <Input
-           accept="image/*"
-            type="file"
-            focusBorderColor="purple.300"
-            css={{
-              "&::file-selector-button":{
-                ...fileUploadCss,
-                color:'black',
-                fontWeight:"bold"
-              }
-            }}
-            onChange={changeImageHandler}
-           />
-           {imagePrev && (
-            <Image src={imagePrev} boxSize={"64"} objectFit={"contain"} rounded={"lg"} boxShadow={'-2px 0 15px rgba(255,0,0,0.5)'}/>
-           )}
            <Button w={"full"} colorScheme='green' type='submit' fontWeight={"bold"} >Create</Button>
        </VStack>
        </form>
