@@ -1,11 +1,12 @@
 const crypto = require("crypto");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
-const axios = require('axios');
-const sendMail = require('./../utils/sendMail');
+const axios = require("axios");
+const sendMail = require("./../utils/sendMail");
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const Cart = require("./../models/cartModel");
 
 const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
@@ -13,7 +14,7 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = catchAsync(async (user, statusCode, res) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
@@ -25,19 +26,42 @@ const createSendToken = (user, statusCode, res) => {
 
   res.cookie("jwt", token, cookieOptions);
 
+  const userId = user._id; // Adjust this according to your authentication method
+  const userCart = await Cart.findOne({ user: userId });
+  let cartItems = "";
+  // Extracting specific data from the cart object
+  if(userCart){
+    cartItems = userCart.restaurants
+    .map((restaurant) => {
+      return restaurant.items.map((item) => ({
+        foodId: item.food,
+        quantity: item.quantity,
+        restaurantId: restaurant.restaurant,
+      }));
+    })
+    .flat();
+  }
+  else{
+    cartItems="";
+  }
+  // Store extracted cart data in res.locals for access in routes
+  // res.locals.cart = cartItems;
+  // req.cart = cartItems;
+
   return res.status(statusCode).json({
     status: "success",
+    cart: cartItems,
     token,
     data: {
       user,
     },
   });
-};
+});
 
 exports.signup = catchAsync(async (req, res, next) => {
   const username = req.body.name.split(" ")[0];
   const gender = req.body.gender;
-  const userEmail=req.body.email;
+  const userEmail = req.body.email;
 
   const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
   const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
@@ -55,7 +79,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     gender: req.body.gender,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    location:req.body.location,
+    location: req.body.location,
     profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
     accountCreatedAt: Date.now(),
   });
@@ -63,6 +87,12 @@ exports.signup = catchAsync(async (req, res, next) => {
   await newUser.save({ validateBeforeSave: false });
 
   const redirectUrl = `${req.protocol}://127.0.0.1:5500/api/users/verifyemail/${verificationCode}`;
+
+  const to = newUser.email;
+  const subject = "Account verification link";
+  const message = ` Kindly click on the link ${redirectUrl} to verify your account status`;
+  sendMail(to, subject, message);
+
   console.log(redirectUrl);
   createSendToken(newUser, 201, res);
 });
