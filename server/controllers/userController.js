@@ -112,6 +112,8 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log(req.file);
+  console.log(req.body);
   //1) Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
@@ -121,7 +123,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       )
     );
   }
-
   //2) Filtering out unwanted field names that are not allowed to be updated
   const filteredBody = filterObj(req.body, "name", "email");
   if(req.file)  filteredBody.profilePic = req.file.filename;
@@ -133,7 +134,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      user: user,
+      user: updatedUser,
     },
   });
 });

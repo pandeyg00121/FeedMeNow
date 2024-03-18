@@ -124,6 +124,7 @@ function Row({request,handleDeleteRequest,toast}){
       duration: 3000,
       isClosable: true,
     });
+    window.location.reload();
   };
 
   return(

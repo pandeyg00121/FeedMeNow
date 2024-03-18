@@ -89,7 +89,7 @@ const Profile = () => {
    }
   },[isLoading,data])
 
-
+   console.log(currentUser);
   // Handle form submission
   const handleSubmit = async() => {
     const updatedUser={

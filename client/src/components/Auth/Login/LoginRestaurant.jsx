@@ -60,8 +60,10 @@ const LoginRestaurant = () => {
     const { value } = e.target;
     setForgotPasswordEmail(value);
   };
+  console.log(formData);
   const handleLogin = async e => {
     e.preventDefault();
+    console.log(formData);
     try {
       const res = await login(formData).unwrap();
       dispatch(setCredentialsrestaurant({ ...res }));

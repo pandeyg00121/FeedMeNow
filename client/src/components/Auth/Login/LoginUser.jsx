@@ -72,6 +72,7 @@ const LoginUser = () => {
 
   const handleLogin = async e => {
     e.preventDefault();
+    console.log(formData)
     try {
       const res = await login(formData).unwrap();
       dispatch(setCredentialsuser({ ...res }));

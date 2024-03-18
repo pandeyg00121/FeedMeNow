@@ -95,8 +95,8 @@ return(
                 </Text>
                 <VStack>
                   {
-                    selectedReview.foodNames.map(f=>(
-                      <Text>{f}</Text>
+                    selectedReview.order.items.map(f=>(
+                      <Text>{f.food} x {f.quantity}</Text>
                     ))
                   }
                 </VStack>

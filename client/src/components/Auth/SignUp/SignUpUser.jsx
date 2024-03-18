@@ -45,13 +45,23 @@ const SignUpUser = () => {
     if (userData.password !== userData.passwordConfirm) {
       alert('Passwords do not match');
     } else {
+
       try {
+        toast({
+          title: 'Verification Link',
+          description: `Verification link has been sent to the e-mail.`,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
         await signup(userData).unwrap();
+        
         navigate('/users/login');
       } catch (err) {
         console.log(err?.data?.message || err.error);
       }
     }
+    
   };
 
   return (
@@ -168,7 +178,7 @@ const SignUpUser = () => {
                   borderColor={'darkblue'}
                   required // Add required attribute to enforce selection
                 >
-                  <option value="">SelectOption</option>
+                  <option value="">Select Option</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </Select>

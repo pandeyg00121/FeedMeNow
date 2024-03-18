@@ -14,6 +14,8 @@ import { SearchIcon } from '@chakra-ui/icons';
 import { useGetAllRestaurantsPublicQuery } from '../../redux/api';
 import { Link } from 'react-router-dom';
 import img1 from '../../assets/backgroundImages/homepage.jpeg';
+import Footer from '../Layout/Footer';
+import Navbar from '../Layout/Navbar';
 
 // RestaurantCard component
 const RestaurantCard = ({
@@ -151,6 +153,7 @@ function AllRestaurants() {
 
   return (
     <ChakraProvider>
+    <Navbar/>
       <Flex direction="row">
         {/* Sidebar */}
         <Sidebar
@@ -208,6 +211,7 @@ function AllRestaurants() {
           </Flex>
         </Flex>
       </Flex>
+      <Footer/>
     </ChakraProvider>
   );
 }

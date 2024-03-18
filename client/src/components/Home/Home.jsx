@@ -15,7 +15,7 @@ import dessert from "../../assets/categories/dessert.jpg"
 import fastfood from "../../assets/categories/fast food.jpg"
 import north from "../../assets/categories/north indian.jpg"
 import south from "../../assets/categories/south indian.jpg"
-import { useGetSearchFoodsQuery, useGetSearchResQuery,useGetHomeRestaurantsQuery,useGetHomeFoodsQuery } from '../../redux/api';
+import {useGetHomeRestaurantsQuery,useGetHomeFoodsQuery } from '../../redux/api';
 
 const Home = () => {
   SwiperCore.use([Navigation]);
