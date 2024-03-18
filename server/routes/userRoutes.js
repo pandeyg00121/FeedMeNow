@@ -13,7 +13,7 @@ const router = express.Router();
 router.use(express.json());
 
 router.post("/signup", authController.signup);
-router.patch("/verifyemail/:verificationCode",authController.verifyEmailHandler);
+router.get("/verifyemail/:verificationCode",authController.verifyEmailHandler);
 router.post("/login", authController.login);
 router.get('/logout', authController.logout);
 router.post("/forgotPassword",authController.forgotPassword);
@@ -27,7 +27,7 @@ router.use("/cart", cartRouter);
 
 router.post("/updateMyPassword",authController.updatePassword);
 router.get("/me", userController.getMe,userController.getUser);
-router.post("/updateMe",userController.uploadUserPhoto ,userController.updateMe);
+router.post("/updateMe",userController.updateMe);
 
 router.get('/restoreCart',)
 

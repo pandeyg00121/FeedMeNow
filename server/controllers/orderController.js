@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET);
+//const stripe=require('stripe')
 const Order = require("./../models/orderModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
@@ -168,6 +168,7 @@ exports.resPrevOrders = catchAsync(async (req, res, next) => {
         const food = await Food.findById(item.food);
 
         // Return modified item details
+        console.log(food);
         return {
           foodName: food.name,
           foodType: food.type,
@@ -308,37 +309,37 @@ function formatTimestamp(timestampString) {
   return formattedTimestamp;
 }
 
-exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  // 1) Get the currently booked tour
-  const userId = req.user.id;
-  const cart = await Cart.findOne({ user: userId })
-  const totalPrice = cart.totalPrice;
-  // // Find the user's cart
-  // const array = Object.entries(await Cart.findOne({ user: userId }));
-  // console.log(array);
-  // const line 
-  // 2) Create checkout session
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    line_items: [
-      {
-        price_data: {
-          currency: "inr",
-          product_data: {
-            name: "Cart checkout Success",
-            // Add more product data as needed
-          },
-          unit_amount: Math.round(totalPrice * 100), // Amount in paise
-        },
-        quantity: 1, // Assuming quantity is 1 for now
-      },
-    ],
-    mode: "payment",
-    success_url: "http://localhost:5173/paymentsuccess",
-    cancel_url: "http://localhost:5173/paymentfailure",
-  });
-  // 3) Create session as response
-  res.status(200).json({
-    id:session.id
-  });
-});
+// exports.getCheckoutSession = catchAsync(async (req, res, next) => {
+//   // 1) Get the currently booked tour
+//   const userId = req.user.id;
+//   const cart = await Cart.findOne({ user: userId })
+//   const totalPrice = cart.totalPrice;
+//   // // Find the user's cart
+//   // const array = Object.entries(await Cart.findOne({ user: userId }));
+//   // console.log(array);
+//   // const line 
+//   // 2) Create checkout session
+//   const session = await stripe.checkout.sessions.create({
+//     payment_method_types: ["card"],
+//     line_items: [
+//       {
+//         price_data: {
+//           currency: "inr",
+//           product_data: {
+//             name: "Cart checkout Success",
+//             // Add more product data as needed
+//           },
+//           unit_amount: Math.round(totalPrice * 100), // Amount in paise
+//         },
+//         quantity: 1, // Assuming quantity is 1 for now
+//       },
+//     ],
+//     mode: "payment",
+//     success_url: "http://localhost:5173/paymentsuccess",
+//     cancel_url: "http://localhost:5173/paymentfailure",
+//   });
+//   // 3) Create session as response
+//   res.status(200).json({
+//     id:session.id
+//   });
+// });

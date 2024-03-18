@@ -32,6 +32,8 @@ import { clearCart } from '../../redux/features/slices/CartSlice';
 // Dummy data for items
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import Navbar from '../Layout/Navbar';
+import Footer from '../Layout/Footer';
 // Motion components for animation
 const MotionBox = motion(Box);
 const MotionText = motion(Text);
@@ -126,6 +128,8 @@ const OrderPage = () => {
   }, 0);
 
   return (
+    <>
+    <Navbar/>
     <VStack
       spacing="4"
       align="start"
@@ -169,7 +173,7 @@ const OrderPage = () => {
           <Heading as="h2" size="md" color="teal.500">
             Subtotal
           </Heading>
-          <Button size="sm" colorScheme="red" onClick={() => handleclearcart()}>
+          <Button size="sm" colorScheme="red" onClick={() => handleclearcart()} mb={3}>
             Clear Cart
           </Button>
         </HStack>
@@ -243,6 +247,8 @@ const OrderPage = () => {
         </Button>
       </MotionBox>
     </VStack>
+    <Footer/>
+    </>
   );
 };
 

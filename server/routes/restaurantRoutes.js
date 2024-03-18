@@ -42,4 +42,3 @@ router.patch("/openMe", restaurantController.openMe);
 
 module.exports = router;
 
-

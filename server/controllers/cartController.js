@@ -64,7 +64,7 @@ exports.getCart = catchAsync(async (req, res, next) => {
       };
     })
   );
-  res.status(200).send(data);
+  res.status(200).send(data); 
 });
 
 exports.clearCart = catchAsync(async (req, res, next) => {

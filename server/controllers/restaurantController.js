@@ -397,13 +397,18 @@ exports.getAllRestaurants = catchAsync(async (req,res,next)=>{
 });   
 
 exports.addItem= catchAsync(async (req, res, next) => {
+  const randomNumber = Math.floor(Math.random() * 10) + 1;
+  const kk=req.body.name.toLowerCase()
+  const tk = req.body.name.toLowerCase()+randomNumber;
+  const image = `https://foodish-api.com/images/${kk}/${tk}.jpg`
+   
     const newFoodItem = await Food.create({
         name: req.body.name,
         type: req.body.type,
         category:req.body.category,
         price: req.body.price,
         description: req.body.description,
-        // image: req.body.image,
+        image: image,
         restaurant: req.restaurant.id,
       
       });

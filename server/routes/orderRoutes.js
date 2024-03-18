@@ -7,5 +7,5 @@ const router = express.Router();
 router.use(express.json());
 
 router.use(authController.protect);
-router.get('/checkout-session', orderController.getCheckoutSession);
+//router.get('/checkout-session', orderController.getCheckoutSession);
 module.exports = router;

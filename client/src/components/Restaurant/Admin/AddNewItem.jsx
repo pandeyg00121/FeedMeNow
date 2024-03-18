@@ -2,7 +2,7 @@ import { Grid,Heading,Container,VStack,Input,Image,Button,Select,Textarea} from 
 import {useState} from 'react'
 import cursor from "../../../assets/cursor red.png"
 import Sidebar from './Sidebar'
-import { useNewFoodItemMutation } from '../../../redux/api'
+import { useAddFoodItemMutation } from '../../../redux/api'
 import {useNavigate} from "react-router-dom"
 
 export const fileUploadCss={
@@ -16,7 +16,7 @@ export const fileUploadCss={
 }
 
 const AddNewItem = () => {
-  const [newFoodItem]=useNewFoodItemMutation();
+  const [newFoodItem]=useAddFoodItemMutation();
   const [name,setName]=useState("");
   const [description,setDescription]=useState("");
   const [price,setPrice]=useState("");

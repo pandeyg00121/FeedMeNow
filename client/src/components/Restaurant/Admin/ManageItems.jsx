@@ -136,13 +136,10 @@ function Row({item,deleteItem,handleEdit}){
 
 function EditItemModal({ isOpen, onClose, item, handleSubmit }) {
   const [updatedItem, setUpdatedItem] = useState(item || {});
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(item?.image || '');
   const [updateItem, { isLoading }] = useUpdateItemMutation(); // Mutation hook
 
   useEffect(() => {
     setUpdatedItem(item || {});
-    setImagePreview(item?.image || '');
   }, [item]);
 
   const handleChange = (e) => {
@@ -150,21 +147,11 @@ function EditItemModal({ isOpen, onClose, item, handleSubmit }) {
     setUpdatedItem({ ...updatedItem, [name]: value });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedImage(file);
-    setImagePreview(URL.createObjectURL(file));
-  };
 
   const handleFormSubmit = async () => {
     try {
       const updatedFields = { ...updatedItem };
-      if (selectedImage) {
-        // If a new image is selected, add it to the updated fields
-        updatedFields.image = selectedImage;
-      }
-
-
+      
       // Call the mutation hook to update the item
       const response = await updateItem({ id: updatedItem._id, ...updatedFields });
       if (response) {
@@ -174,6 +161,7 @@ function EditItemModal({ isOpen, onClose, item, handleSubmit }) {
     } catch (error) {
       console.error('Error updating item:', error);
     }
+    window.location.reload();
   };
 
   return (
@@ -194,15 +182,6 @@ function EditItemModal({ isOpen, onClose, item, handleSubmit }) {
           <FormControl>
             <FormLabel>Item Price</FormLabel>
             <Input name="price" value={updatedItem.price} onChange={handleChange} />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Item Image</FormLabel>
-            <Input
-              accept="image/*"
-              type="file"
-              onChange={handleImageChange}
-            />
-            {imagePreview && <Image src={imagePreview} alt="Item Preview" maxH={100} mt={2} />}
           </FormControl>
           <Button mt={4} colorScheme="teal" onClick={handleFormSubmit} isLoading={isLoading}>
             Save Changes

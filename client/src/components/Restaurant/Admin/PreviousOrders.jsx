@@ -163,7 +163,7 @@ const PreviousOrders = () => {
       <Heading textTransform={'uppercase'} children="Previous Orders" my={"2"} textAlign={["center","left"]}/>
       <TableContainer w={["100vw","full"]} boxShadow={'-1px 0 10px rgba(255,0,0,0.5)'} borderRadius={"lg"} borderColor="rgba(255,0,0,0.7)"  p={5} mt={8}>
         <Table variant={"simple"} size={"lg"}>
-          <TableCaption>All available items in the menu</TableCaption>
+          <TableCaption>All previous orders</TableCaption>
           <Thead>
             <Tr>
             <Th fontSize={"md"}>Order Id</Th>

@@ -14,7 +14,7 @@ const restaurantSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ["cafe", "restaurant", "canteen", "takeout"],
-    required: [true, "Please choose your type of establishment"],
+    required: [false, "Please choose your type of establishment"],
   },
   location: {
     type: {

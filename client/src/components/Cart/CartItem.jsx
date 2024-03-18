@@ -16,15 +16,12 @@ import {
 } from '../../redux/features/slices/CartSlice';
 import { useDispatch } from 'react-redux';
 import { useUpdatefoodItemMutation } from '../../redux/api';
-import { useDeleteItemCartMutation } from '../../redux/api';
 const CartItem = ({ id, name, price, quantity, initialprice }) => {
   const dispatch = useDispatch();
   const [isDeleted, setIsDeleted] = useState(false); // State to control item visibility
   const [localQuantity, setLocalQuantity] = useState(quantity);
   const [updateitem, { isLoadingupdate, isErrorupdate }] =
     useUpdatefoodItemMutation();
-  const [deleteitem, { isLoadingdelete, isErrordelete }] =
-    useDeleteItemCartMutation();
   const handleMinusClick = async () => {
     try {
       if (localQuantity > 1) {

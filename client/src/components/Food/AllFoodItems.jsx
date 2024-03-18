@@ -37,9 +37,12 @@ import {
 } from '../../redux/features/slices/CartSlice';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import Navbar from '../Layout/Navbar';
+import Footer from '../Layout/Footer';
 
 const FoodItemCard = ({
   _id,
+  image,
   name,
   type,
   category,
@@ -161,7 +164,7 @@ const FoodItemCard = ({
       bg="white"
       color="gray.800"
     >
-      <Image src={img1} alt={name} boxSize="300px" objectFit="cover" />
+      <Image src={image} alt={name} boxSize="300px" objectFit="cover" />
       <Box p={4}>
         <Text fontSize="xl" fontWeight="semibold" mb={1} color="gray.800">
           {name}
@@ -283,6 +286,7 @@ function AllFoodItems() {
 
   return (
     <ChakraProvider>
+      <Navbar/>
       <Flex direction="row">
         <Flex direction="column" p={4}>
           <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={4}>
@@ -379,6 +383,7 @@ function AllFoodItems() {
           </Flex>
         </Flex>
       </Flex>
+    <Footer/>
     </ChakraProvider>
   );
 }

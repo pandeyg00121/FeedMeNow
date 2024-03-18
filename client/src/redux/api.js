@@ -20,6 +20,9 @@ export const myApi=createApi({
     endpoints:(builder)=>({
       //Get requests
       //home routes
+      getRestaurantOne: builder.query({
+        query: slug => `/restaurantOne/${slug}`,
+      }),
       getHomeRestaurants:builder.query({query:()=>"top-5-restaurants"}),
       getHomeFoods:builder.query({query:()=>"top-6-foods"}),
       //restaurant routes
@@ -28,12 +31,13 @@ export const myApi=createApi({
       getCurrentOrders:builder.query({query:()=>"/restaurants/manageOrders/current"}),
       getAllReviews:builder.query({query:()=>"/restaurants/myReviews"}),
       //search routes
-      getSearchRes:builder.query({query:()=>"/restaurantsAll"}),
-      getSearchFoods:builder.query({query:()=>"/foodsAll"}),
+      getAllRestaurantsPublic: builder.query({ query: () => '/restaurantsAll' }),
+      getAllFoods: builder.query({ query: () => '/foodsAll' }),
       //admin routes
       getAllUsers:builder.query({query:()=>"/admin/allUser"}),
       getAllRestaurants:builder.query({query:()=>"/admin/allRes"}),
       getPendingReqAdmin:builder.query({query:()=>"/admin/pendingReq"}),
+      getUserMap: builder.query({ query: () => '/admin/userMap' }),
       //cart routes
       getMyCart:builder.query({query:()=>"/users/cart"}),
       //user routes
@@ -44,8 +48,29 @@ export const myApi=createApi({
     
 
       //Post requests
+      placeOrder: builder.mutation({
+        query: () => ({
+          url: '/users/placeOrder',
+          method: 'POST',
+          body: {},
+        }),
+      }),
+      newFoodItem: builder.mutation({
+        query: id => ({
+          url: '/users/cart/addItem',
+          method: 'POST',
+          body: id,
+        }),
+      }),
+      updatefoodItem: builder.mutation({
+        query: id => ({
+          url: '/users/cart/updateItem',
+          method: 'POST',
+          body: id,
+        }),
+      }),
       //restaurant routes
-      newFoodItem:builder.mutation({
+      addFoodItem:builder.mutation({
         query:(food)=>({
           url:"/restaurants/addItem",
           method:"POST",
@@ -126,12 +151,18 @@ export const myApi=createApi({
         method: 'DELETE',
       }),
     }),
+    deleteCart: builder.mutation({
+      query: () => ({
+        url: '/users/cart/clearCart', 
+        method: 'DELETE',
+      }),
+    }),
        
       
       
      })
 })
 
-export const {useGetHomeFoodsQuery,useGetHomeRestaurantsQuery,useNewFoodItemMutation,useGetSearchFoodsQuery,useGetAllMenuItemsQuery,useUpdateItemMutation,useGetPreviousOrdersQuery,useGetCurrentOrdersQuery,useUpdateOrderStatusMutation,useDeleteItemMutation,useGetAllUsersQuery,useUpdateUserStatusMutation,useDeleteUserMutation,useGetAllRestaurantsQuery,useDeleteResMutation,useGetPendingReqAdminQuery,useAcceptPendingReqMutation,useGetUserPrevOrdersQuery,useGetUserCurrOrdersQuery,
-useGetUserReviewsQuery,useGetUserQuery,useAddReviewMutation,useUpdatePasswordMutation,useUpdateProfileMutation}=myApi;
+export const {useGetHomeFoodsQuery,useGetHomeRestaurantsQuery,useAddFoodItemMutation,useGetAllMenuItemsQuery,useUpdateItemMutation,useGetPreviousOrdersQuery,useGetCurrentOrdersQuery,useUpdateOrderStatusMutation,useDeleteItemMutation,useGetAllUsersQuery,useUpdateUserStatusMutation,useDeleteUserMutation,useGetAllRestaurantsQuery,useDeleteResMutation,useGetPendingReqAdminQuery,useAcceptPendingReqMutation,useGetUserPrevOrdersQuery,useGetUserCurrOrdersQuery,
+useGetUserReviewsQuery,useGetUserQuery,useAddReviewMutation,useUpdatePasswordMutation,useUpdateProfileMutation,useGetRestaurantOneQuery,useGetAllRestaurantsPublicQuery,useGetAllFoodsQuery,useGetUserMapQuery,useGetMyCartQuery,usePlaceOrderMutation,useNewFoodItemMutation,useUpdatefoodItemMutation,useDeleteCartMutation}=myApi;
 
