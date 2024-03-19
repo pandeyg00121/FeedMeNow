@@ -16,6 +16,11 @@ import fastfood from "../../assets/categories/fast food.jpg"
 import north from "../../assets/categories/north indian.jpg"
 import south from "../../assets/categories/south indian.jpg"
 import {useGetHomeRestaurantsQuery,useGetHomeFoodsQuery } from '../../redux/api';
+import pic1 from "../../assets/restaurantpics/pic1.jpg"
+import pic2 from "../../assets/restaurantpics/pic2.jpg"
+import pic3 from "../../assets/restaurantpics/pic3.jpg"
+import pic4 from "../../assets/restaurantpics/pic4.jpg"
+import pic5 from "../../assets/restaurantpics/pic5.png"
 
 const Home = () => {
   SwiperCore.use([Navigation]);
@@ -52,6 +57,7 @@ const Home = () => {
       pic:north
     }
   ]
+  const pics=[pic1,pic2,pic3,pic4,pic5];
   useEffect(() => {
     if (!isLoadingFoods && foodsData) {
         setProducts(foodsData);
@@ -80,7 +86,7 @@ useEffect(() => {
               <SwiperSlide key={index}>
                 <div
                   style={{
-                    background: `url(${bg}) center no-repeat`,
+                    background: `url(${pics[index]}) center no-repeat`,
                     backgroundSize: 'cover',
                     height: "400px",
                     borderRadius: "20px",
@@ -116,7 +122,7 @@ useEffect(() => {
     </Box>
     <Flex flexWrap="wrap" mt={"8px"} gap={5} marginTop={5}>
         { products && products.slice(0, isLargerThan768 ? 6 : 2).map(product => (
-          <Link to={`/food/${product.slug}`}>
+          <Link to={`/foods`}>
           <ProductCard key={product.id} product={product}/>
           </Link>
         ))}
@@ -132,7 +138,7 @@ export default Home;
 
 function CategoryCard({item}){
   return(
-    <Link to={`/search?category=${item.name}`}>
+    <Link to={`/foods`}>
     <Box width="225px" 
     height={"155px"} 
     borderWidth="1px" 

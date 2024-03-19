@@ -178,7 +178,7 @@ const FoodItemCard = ({
           </Text>
         </Flex>
         <Text color="gray.600" fontSize="sm" mb={2}>
-          Price: ${price}
+          Price: ₹{price}
         </Text>
         <Text
           color="teal.500"
@@ -313,24 +313,25 @@ function AllFoodItems() {
             <Button size="sm" onClick={() => handleFilterByType('')}>
               Show All
             </Button>
-            <Button size="sm" mt={2} onClick={() => handleFilterByType('veg')}>
+            <Button size="sm" mt={6} colorScheme={"green"} onClick={() => handleFilterByType('veg')}>
               Veg
             </Button>
             <Button
               size="sm"
-              mt={2}
+              mt={6}
+              colorScheme={"red"}
               onClick={() => handleFilterByType('non-veg')}
             >
               Non-Veg
             </Button>
           </Flex>
           <Link to="/users/viewcart">
-            <Button size="sm" mt={4} ml={6} colorScheme="teal">
+            <Button size="sm" mt={6} ml={6} colorScheme="teal">
               View Cart
             </Button>
           </Link>
           <Link to="/restaurants">
-            <Button size="sm" mt={2} onClick={handleViewAllRestaurants}>
+            <Button size="sm" mt={6} onClick={handleViewAllRestaurants}>
               View All Restaurants
             </Button>
           </Link>

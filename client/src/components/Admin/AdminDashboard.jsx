@@ -120,7 +120,6 @@ const AdminDashboard = () => {
           <Box
             mt={['8', '16']}
             mx={['4', '16']}
-            bg="gray.50"
             boxShadow={'-3px 0 12px rgba(255, 199, 0,0.6)'}
             borderRadius={'xl'}
             padding={'2px'}
@@ -162,7 +161,6 @@ const AdminDashboard = () => {
               margin={'50px'}
               mb={'40px'}
               borderRadius={'xl'}
-              boxShadow={'md'}
               boxShadow={'-3px 0 12px rgba(255, 199, 0,0.6)'}
               maxHeight={'800px'}
             >

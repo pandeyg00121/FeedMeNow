@@ -34,11 +34,13 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
+import { useNavigate } from 'react-router-dom';
 // Motion components for animation
 const MotionBox = motion(Box);
 const MotionText = motion(Text);
 
 const OrderPage = () => {
+  const navigate=useNavigate();
   useEffect(() => {}, []);
   // State for selected items, payment method, and confirmation button label
   const dispatch = useDispatch();
@@ -70,7 +72,7 @@ const OrderPage = () => {
       localStorage.removeItem('cartItems');
 
       await placeOrder();
-      window.location.reload();
+      navigate('/payment/success');
     } catch (error) {
       console.log(error);
     }

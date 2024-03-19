@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import customIcon from '../../assets/location.jpg'; // Import your custom icon
 import Sidebar from './Sidebar';
-import { useGetUserMapQuery } from '../../redux/api';
+
 
 // Fix for Leaflet marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -30,7 +30,7 @@ const UserMap = ({ users, isMapLoaded }) => {
       const avgLongitude =
         users.reduce((total, user) => total + user.coordinates[1], 0) /
         users.length;
-      setMapCenter([avgLatitude, avgLongitude]);
+      setMapCenter([25.00,81.00]);
     }
   }, [users]);
 
@@ -68,31 +68,48 @@ const UserMap = ({ users, isMapLoaded }) => {
 };
 
 const Map = () => {
-  const { isLoading, isError, isSuccess, data, error } = useGetUserMapQuery('');
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  // const { isLoading, isError, isSuccess, data, error } = useGetUserMapQuery('');
+  // const [isMapLoaded, setIsMapLoaded] = useState(false);
 
-  console.log(isLoading, isError, isSuccess, data, error);
+  // console.log(isLoading, isError, isSuccess, data, error);
   const [users, setUsers] = useState([
-    { name: 'Delhi', coordinates: [28.7041, 77.1025] },
-    { name: 'Mumbai', coordinates: [19.076, 72.8777] },
-    { name: 'Kolkata', coordinates: [22.5726, 88.3639] },
-    { name: 'Chennai', coordinates: [13.0827, 80.2707] },
-    { name: 'Bangalore', coordinates: [12.9716, 77.5946] },
+    { name: 'Priyanshu', coordinates: [25.4358, 81.8463] },
+    { name: 'Jatin', coordinates: [25.4486, 81.8337] },
+    { name: 'Abhinav', coordinates: [25.45, 81.85] },
+    { name: 'Pranay', coordinates: [25.4345, 81.8467] },
+    { name: 'Manasvi', coordinates: [25.4475, 81.8551] },
+    { name: 'Palash', coordinates: [25.4385, 81.8481] },
+    { name: 'Harsh', coordinates: [25.4398, 81.8342] },
+    { name: 'Arjav', coordinates: [25.4472, 81.8515] },
+    { name: 'Ankush', coordinates: [25.4311, 81.8406] },
+    { name: 'Ayush', coordinates: [25.4436, 81.8391] },
+    { name: 'Deepanshu', coordinates: [25.4369, 81.8533] },
+    { name: 'Neelansh', coordinates: [25.4514, 81.8445] },
+    { name: 'Ashu', coordinates: [25.4478, 81.8376] },
+    { name: 'Snehal', coordinates: [25.4323, 81.848] },
+    { name: 'Kamal', coordinates: [25.4462, 81.8412] },
   ]);
-  useEffect(() => {
-    if (isSuccess) {
-      setIsMapLoaded(true);
-    }
-  }, [isSuccess]);
-  useEffect(() => {
-    if (!isLoading && data) {
-      setUsers(data);
-    }
-  }, [isLoading, data]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     setIsMapLoaded(true);
+  //   }
+  // }, [isSuccess]);
+  // useEffect(() => {
+  //   if (!isLoading && data) {
+  //     setUsers(data);
+  //   }
+  // }, [isLoading, data]);
 
-  useEffect(() => {
-    console.log(users);
-  }, [users]);
+  // useEffect(() => {
+  //   console.log(users);
+  // }, [users]);
+  // // const [users] = useState([
+  //   { id: 1, name: 'Delhi', location: [28.7041, 77.1025] },
+  //   { id: 2, name: 'Mumbai', location: [19.076, 72.8777] },
+  //   { id: 3, name: 'Kolkata', location: [22.5726, 88.3639] },
+  //   { id: 4, name: 'Chennai', location: [13.0827, 80.2707] },
+  //   { id: 5, name: 'Bangalore', location: [12.9716, 77.5946] },
+  // ]);
 
   return <UserMap users={users} />;
 };

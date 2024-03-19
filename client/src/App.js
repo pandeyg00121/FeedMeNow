@@ -27,6 +27,9 @@ import RestaurantMenuPage from './components/Menu/MenuNew.jsx';
 import AllFoodItems from './components/Food/AllFoodItems.jsx';
 import OrderPage from './components/Cart/Cart.jsx';
 import ContactUs from './components/ContactUs.jsx';
+import Front from './components/Home/Front.jsx';
+import SuccessPage from './components/Payment/SuccessPage.jsx';
+import Map from './components/Admin/UserMap';
 
 
 function App() {
@@ -35,16 +38,19 @@ function App() {
       <Routes>
       {/*Public Routes*/}
       {/*User Routes*/}
+      <Route path='/front' element={<Front/>}/>
       <Route path='' element={<PrivateRouteUser/>}>
           <Route path="/" element={<Home />} />
           <Route path='/restaurants' element={<AllRestaurants/>}/>
           <Route path="/restaurant/:slug" element={<RestaurantMenuPage/>} />
           <Route path="/foods" element={<AllFoodItems />} />
           <Route path="/users/viewcart" element={<OrderPage />} />
+          <Route path='/payment/success' element={<SuccessPage/>}/>
           <Route path="/user/profile" element={<Profile/>}>
           <Route path="current-order" element={<CurrentOrdersUser />} />
           <Route path="previous-orders" element={<PreviousOrdersUser />} />
           <Route path="my-reviews" element={<Reviews />} />
+          
           </Route>
         </Route>
       {/* Auth Routes */}
@@ -73,7 +79,7 @@ function App() {
         <Route path="/admin/users" element={<AdminUser />} />
         <Route path="/admin/restaurants" element={<AdminRestaurant />} />
         <Route path="/admin/restaurants/request" element={<AdminRequest />} />
-        <Route path="/admin/usermap" element={<UserMap />} />
+        <Route path="/admin/usermap" element={<Map />} />
         </Route>
       </Routes>
     </BrowserRouter>
