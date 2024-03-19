@@ -8,7 +8,7 @@ const PrivateRouteUser = () => {
   const isAdmin =
     userInfo && userInfo.data && userInfo.data.user.role === 'user';
 
-  return isAdmin ? <Outlet /> : <Navigate to="/users/login" replace />;
+  return isAdmin ? <Outlet /> : <Navigate to="/front" replace />;
 };
 
 export default PrivateRouteUser;
