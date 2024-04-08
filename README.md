@@ -19,11 +19,17 @@
 *Admin authorisation for restaurants for their verification <br>
 *Reviews for restaurants <br>
 
+### Documentation
+The POSTMAN documentation of the server/API can be viewed here with all the details
+```
+https://documenter.getpostman.com/view/24093777/2sA2xjzrap
+```
+
 ### Innovation: <br>
 Mutli cart feature wherein a user can add food iteams from three different restaurants in his cart.<br>
 User can place order for any of those three restauarnts in one go during checkout. <br>
 
-# Project Setup
+## Project Setup
 
 This guide will help you set up the project by installing the necessary npm modules for both the frontend and backend.<br>
 CLONE this project using 
